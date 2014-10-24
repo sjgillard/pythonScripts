@@ -1,4 +1,4 @@
-
+import maya.cmds as cmds
 def makeGroups():
     cmds.group(em=True, name='nameMe')
     cmds.group(em=True, name='geometry')
