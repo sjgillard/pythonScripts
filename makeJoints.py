@@ -57,7 +57,7 @@ def runItArm():
     positionR=getLocPos(locatorsR)
     
     #left arm joints, this way we don't have to worry about things getting messed up in mirroring
-    armJointsL = makeLimbJoints(positionL)
+    armJointsL = makeJoints(positionL)
     prefix = 'rig_'
     newName = ''
     suffix = []
@@ -74,7 +74,7 @@ def runItArm():
             num += 1
     
     #right arm joints, this way we don't have to worry about things getting messed up in mirroring
-    armJointsR = makeLimbJoints(positionR)
+    armJointsR = makeJoints(positionR)
     num = 0
     prefix = 'rig_'
     newName = ''
@@ -107,7 +107,7 @@ def runItFeet():
     positionR=getLocPos(locatorsR)
     
     #left foot joints, this way we don't have to worry about things getting messed up in mirroring
-    footJointsL = makeLimbJoints(positionL)
+    footJointsL = makeJoints(positionL)
     prefix = 'rig_'
     newName = ''
     suffix = []
@@ -124,7 +124,7 @@ def runItFeet():
             num += 1
     
     #right foot joints, this way we don't have to worry about things getting messed up in mirroring
-    armJointsR = makeLimbJoints(positionR)
+    armJointsR = makeJoints(positionR)
     num = 0
     prefix = 'rig_'
     newName = ''
@@ -155,7 +155,7 @@ def runItLeg():
     positionR=getLocPos(locatorsR)
     
     #left leg joints, this way we don't have to worry about things getting messed up in mirroring
-    legJointsL = makeLimbJoints(positionL)
+    legJointsL = makeJoints(positionL)
     prefix = 'rig_'
     newName = ''
     suffix = []
@@ -172,7 +172,7 @@ def runItLeg():
             num += 1
     
     #right leg joints, this way we don't have to worry about things getting messed up in mirroring
-    legJointsR = makeLimbJoints(positionR)
+    legJointsR = makeJoints(positionR)
     prefix = 'rig_'
     newName = ''
     suffix = []
