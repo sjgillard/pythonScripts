@@ -1,0 +1,23 @@
+#controlSelector
+
+import maya.cmds as cmds
+import pymel.core as pm
+
+def controlSelect():
+	#gets members of layer with controls
+    cmds.select(pm.editDisplayLayerMembers('unitRig_Rig_CTRL', query=True))
+    #puts controls' shape nodes in a list
+    temp = cmds.ls(selection=True, dag=True, shapes=True)
+    type = False
+    controls = []
+    
+    for t in temp:
+        type = cmds.objectType(t, isType='nurbsCurve')
+        #gets transform node from shape node
+        controlTransform = cmds.listRelatives(t, parent=True)
+        if type == True:
+            controls.append(controlTransform)
+            
+    cmds.select(controls)
+	
+controlSelect()
