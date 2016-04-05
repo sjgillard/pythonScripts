@@ -11,7 +11,7 @@ class ProjectOrganizer():
 
   def makeNewProject(self): # Making all the new directories and setup for a new project
   	if os.path.exists(self.userDir):
-  		self.projectDir =  self.userDir + 'Projects/Active/' + self.projectName
+  		self.projectDir =  os.path.join(self.userDir, 'Projects/Active/', self.projectName)
 
   		os.makedirs(self.projectDir + '/2D/Concepts')
   		os.makedirs(self.projectDir + '/2D/Textures')
@@ -19,9 +19,13 @@ class ProjectOrganizer():
   		os.makedirs(self.projectDir + '/2D/Renders')
 
   		os.makedirs(self.projectDir + '/3D/Models/Characters')
-  		os.makedirs(self.projectDir + '/3D/Rigs')
   		os.makedirs(self.projectDir + '/3D/Models/Environments')
   		os.makedirs(self.projectDir + '/3D/Models/Props')
+  		os.makedirs(self.projectDir + '/3D/Rigs/Props')
+  		os.makedirs(self.projectDir + '/3D/Rigs/Characters')
+
+  		os.makedirs(self.projectDir + '/Scripts')
+  		os.makedirs(self.projectDir + '/Documentation')
 
   def makeNewRepo(sef): # Making all new repository for projects
   	try:
@@ -55,4 +59,37 @@ class ProjectOrganizer():
   	except OSError as exception:
   		if exception.errno != errno.EEXIST:
   			raise
+
+  def newAsset(self, assetName, assetType): # New asset organization and documentation
+  	if 'Model' in assetType:
+  		if 'Character' in assetType:
+  			newDir = os.path.join(self.projectDir, '/3D/Models/Character', assetName)
+  			os.makedirs(newDir + '/Model')
+  			os.makedirs(newDir + '/Textures')
+  			os.makedirs(newDir + '/Reference')
+  		elif 'Environment' in assetType:
+  			newDir = os.path.join(self.projectDir, '/3D/Models/Environments', assetName)
+  			os.makedirs(newDir + '/Model')
+  			os.makedirs(newDir + '/Textures')
+  			os.makedirs(newDir + '/Reference')
+  		elif 'Prop' in assetType:
+  			newDir = os.path.join(self.projectDir, '/3D/Models/Props', assetName)
+  			os.makedirs(newDir + '/Model')
+  			os.makedirs(newDir + '/Textures')
+  			os.makedirs(newDir + '/Reference')
+
+  def finalAsset(self): # Creating a final/locked version of the asset
+  	pass
+
+  def backupAsset(self): # A feature that allows for backing up at the end of each session
+  	pass
+
+  def makeGlobal(self): # A feature to move a finaled asset to the Global dir
+  	pass
+
+  def passAsset(self): # A feature that allows for copying and pasting items in different dirs
+  	pass
+
+  def archiveProject(self): # For ending projects without deleting them
+  	pass
   	
