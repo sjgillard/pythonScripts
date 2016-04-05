@@ -1,0 +1,58 @@
+# project organizer
+
+import os
+import errno
+
+class ProjectOrganizer():
+
+  def __init__(self, userDir, projectName):
+  	self.userDir = userDir
+	self.projectName = projectName
+
+  def makeNewProject(self): # Making all the new directories and setup for a new project
+  	if os.path.exists(self.userDir):
+  		self.projectDir =  self.userDir + 'Projects/Active/' + self.projectName
+
+  		os.makedirs(self.projectDir + '/2D/Concepts')
+  		os.makedirs(self.projectDir + '/2D/Textures')
+  		os.makedirs(self.projectDir + '/2D/Comps')
+  		os.makedirs(self.projectDir + '/2D/Renders')
+
+  		os.makedirs(self.projectDir + '/3D/Models/Characters')
+  		os.makedirs(self.projectDir + '/3D/Rigs')
+  		os.makedirs(self.projectDir + '/3D/Models/Environments')
+  		os.makedirs(self.projectDir + '/3D/Models/Props')
+
+  def makeNewRepo(sef): # Making all new repository for projects
+  	try:
+  		os.makedirs(self.userDir + '/Projects/Active') # Main repository for active projects.
+  		if self.projectName:
+  			makeNewProject()
+
+  		os.makedirs(self.userDir + '/Projects/Inactive') # Main repository for inactive projects
+
+  		os.makedirs(self.userDir + '/Projects/Global') # Main repository for global resources
+  		os.makedirs(self.userDir + '/Projects/Global/2D/Concepts')
+  		os.makedirs(self.userDir + '/Projects/Global/2D/Textures')
+  		#os.makedirs(self.userDir + '/Projects/Global/3D/Models/Maya')
+  		#os.makedirs(self.userDir + '/Projects/Global/3D/Models/Houdini')
+  		#os.makedirs(self.userDir + '/Projects/Global/3D/Models/Blender')
+  		os.makedirs(self.userDir + '/Projects/Global/3D/Models/Props/Maya')
+  		os.makedirs(self.userDir + '/Projects/Global/3D/Models/Props/Houdini')
+  		os.makedirs(self.userDir + '/Projects/Global/3D/Models/Props/Blender')
+  		os.makedirs(self.userDir + '/Projects/Global/3D/Models/Environments/Maya')
+  		os.makedirs(self.userDir + '/Projects/Global/3D/Models/Environments/Houdini')
+  		os.makedirs(self.userDir + '/Projects/Global/3D/Models/Environments/Blender')
+  		os.makedirs(self.userDir + '/Projects/Global/3D/Rigs/Maya')
+  		os.makedirs(self.userDir + '/Projects/Global/3D/Rigs/Houdini')
+  		os.makedirs(self.userDir + '/Projects/Global/3D/Rigs/Blender')
+  		os.makedirs(self.userDir + '/Projects/Global/Python/Scripts/Maya')
+  		os.makedirs(self.userDir + '/Projects/Global/Python/Scripts/Houdini')
+  		os.makedirs(self.userDir + '/Projects/Global/Python/Scripts/Katana')
+  		os.makedirs(self.userDir + '/Projects/Global/Python/Scripts/Blender')
+  		os.makedirs(self.userDir + '/Projects/Global/Python/Scripts/Nuke')
+
+  	except OSError as exception:
+  		if exception.errno != errno.EEXIST:
+  			raise
+  	
