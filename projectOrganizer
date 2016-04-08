@@ -2,8 +2,9 @@
 
 import os
 import errno
-import maya.standalone
+import maya.standalone # Allows you to use Maya without the UI
 import maya.cmds as cmds
+import shutil
 
 maya.standalone.initialize("Python")
 
@@ -78,7 +79,8 @@ class ProjectOrganizer():
   			newDir = os.path.join(self.projectDir, '/3D/Models/Character/', assetName)
   			os.makedirs(newDir)
 
-  			fileName = os.path.join('/3D/Models/Character/', assetName + '_mod01')
+  			# Create Maya file
+  			fileName = os.path.join('/3D/Models/Character/', assetName + '_mod-01.ma')
   			cmds.file(new=True, force=True)
   			cmds.file(rename=fileName)
   			cmds.file(save=True, type='mayaAscii')
@@ -89,7 +91,8 @@ class ProjectOrganizer():
   			newDir = os.path.join(self.projectDir, '/3D/Models/Environments/', assetName)
   			os.makedirs(newDir)
 
-  			fileName = os.path.join('/3D/Models/Environments/Model/', assetName + '_env01')
+  			# Create Maya file
+  			fileName = os.path.join('/3D/Models/Environments/Model/', assetName + '_env-01.ma')
   			cmds.file(new=True, force=True)
   			cmds.file(rename=fileName)
   			cmds.file(save=True, type='mayaAscii')
@@ -100,7 +103,8 @@ class ProjectOrganizer():
   			newDir = os.path.join(self.projectDir, '/3D/Models/Props/', assetName)
   			os.makedirs(newDir)
 
-  			fileName = os.path.join('/3D/Models/Props/Model/', assetName + '_mod_prop01')
+  			# Create Maya file
+  			fileName = os.path.join('/3D/Models/Props/Model/', assetName + '_mod_prop-01.ma')
   			cmds.file(new=True, force=True)
   			cmds.file(rename=fileName)
   			cmds.file(save=True, type='mayaAscii')
@@ -125,7 +129,8 @@ class ProjectOrganizer():
   						modFile = file
 
 
-  			fileName = os.path.join('/3D/Rigs/Character/', assetName + '_rig01')
+  			# Create Maya file with references
+  			fileName = os.path.join('/3D/Rigs/Character/', assetName + '_rig-01.ma')
   			cmds.file(new=True, force=True)
   			cmds.file(rename=fileName)
   			cmds.file(reference=modFile)
@@ -147,7 +152,8 @@ class ProjectOrganizer():
   						modFile = file
 
 
-  			fileName = os.path.join('/3D/Rigs/Prop/', assetName + '_rig_prop01')
+  			# Create Maya file with references
+  			fileName = os.path.join('/3D/Rigs/Prop/', assetName + '_rig_prop-01.ma')
   			cmds.file(new=True, force=True)
   			cmds.file(rename=fileName)
   			cmds.file(reference=modFile)
@@ -175,26 +181,50 @@ class ProjectOrganizer():
   					elif '_env' in file:
   						envFile = file
 
+  		# Create Maya file with references
+  		fileName = os.path.join('/3D/Animations/', assetName + '_ani-01.ma')
+  		cmds.file(new=True, force=True)
+  		cmds.file(rename=fileName)
+  		cmds.file(reference=rigFile)
+  		cmds.file(reference=envFile)
+  		cmds.file(save=True, type='mayaAscii')
 
-  			fileName = os.path.join('/3D/Animations/', assetName + '_ani01')
-  			cmds.file(new=True, force=True)
-  			cmds.file(rename=fileName)
-  			cmds.file(reference=rigFile)
-  			cmds.file(reference=envFile)
-  			cmds.file(save=True, type='mayaAscii')
-
-  def finalAsset(self): # Creating a final/locked version of the asset
-  	pass
+  def finalAsset(self, assetName, assetFile, program): # Creating a final/locked version of the asset
+  	if 'maya' in program:
+  		name = assetName.split('-')
+  		lockedName = name[0] + '-final.ma'
+  		cmds.file(assetFile, open=True)
+  		cmds.file(rename=lockedName)
+  		cmds.file(lockFile=True)
+  		cmds.file(save=True, type='mayaAscii')
 
   def backupAsset(self): # A feature that allows for backing up at the end of each session
   	pass
 
-  def makeGlobal(self): # A feature to move a finaled asset to the Global dir
-  	pass
+  def makeGlobal(self, assetDir, assetFile, destDir): # A feature to move a finaled asset to the Global dir
+  	if 'final' not in assetFile:
+  		print 'Only final assets will be placed in Global.' # For now focus on getting only final versions.
+  	else:
+	  	try:
+	  		shutil.copytree(assetDir, destDir) # Move the all files connected to asset, may change to be specific
+	  										   # set of files. Still working it out.
+	  	except OSError as exception:
+	  		if exception.errno == errno.ENOTDIR:
+	  			shutil.copy(assetDir, destDir)
+	  		else:
+	  			raise
 
   def passAsset(self): # A feature that allows for copying and pasting items in different dirs
   	pass
 
-  def archiveProject(self): # For ending projects without deleting them
-  	pass
+  def archiveProject(self, oldProject): # For ending projects without deleting them
+  	archiveDir = os.path.join(self.userDir, '/Projects/Inactive')
+  	try:
+  		shutil.copytree(oldProject, archiveDir) # Move the project files to the archive
+  		shutil.rmtree(oldProject) # Delete the original because a copy/backup has been made
+  	except OSError as exception:
+  		if exception.errno == errno.ENOTDIR:
+  			shutil.copy(oldProject, archiveDir)
+  		else:
+  			raise
   	
