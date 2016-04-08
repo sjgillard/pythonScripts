@@ -95,6 +95,19 @@ class ProjectOrganizer():
   			if relatedFiles:
   				for relatedFile in relatedFiles:
   					copyfile(relatedFile, modelDir)
+  		if 'Animation' in assetType:
+		newDir = os.path.join(self.projectDir, '/3D/Rigs/Character', assetName)
+		os.makedirs(newDir)
+		rigDir = os.path.join(newDir, '/Rigs')
+		envDir = os.path.join(newDir, '/Environment')
+		# Then it should copy over files needed
+		if relatedFiles:
+			for relatedFile in relatedFiles:
+				if 'Environment' in relatedFile:
+					copyfile(relatedFile, envDir)
+				elif 'Rig' in relatedFile:
+					copyfile(relatedFile, rigDir)
+					
   def finalAsset(self): # Creating a final/locked version of the asset
   	pass
 
