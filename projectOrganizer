@@ -78,6 +78,23 @@ class ProjectOrganizer():
   			os.makedirs(newDir + '/Textures')
   			os.makedirs(newDir + '/Reference')
 
+  	if 'Rig' in assetType:
+  		if 'Character' in assetType:
+  			newDir = os.path.join(self.projectDir, '/3D/Rigs/Character', assetName)
+  			os.makedirs(newDir)
+  			modelDir = os.path.join(newDir, '/Model')
+  			# Then it should copy over files needed
+  			if relatedFiles:
+  				for relatedFile in relatedFiles:
+  					copyfile(relatedFile, modelDir)
+  		elif 'Prop' in assetName;
+  			newDir = os.path.join(self.projectDir, '/3D/Rigs/Prop', assetName)
+  			os.makedirs(newDir)
+  			modelDir = os.path.join(newDir, '/Model')
+  			# Then it should copy over files needed
+  			if relatedFiles:
+  				for relatedFile in relatedFiles:
+  					copyfile(relatedFile, modelDir)
   def finalAsset(self): # Creating a final/locked version of the asset
   	pass
 
