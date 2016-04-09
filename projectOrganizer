@@ -5,78 +5,94 @@ import errno
 import maya.standalone # Allows you to use Maya without the UI
 import maya.cmds as cmds
 import shutil
+import assetTracking
 
 maya.standalone.initialize("Python")
 
 class ProjectOrganizer():
 
-  def __init__(self, userDir, projectName):
+  def __init__(self, userDir):
   	self.userDir = userDir
-	self.projectName = projectName
+	self.assetTracker = assetTracking.AssetTracking()
 
-  def makeNewProject(self, program): # Making all the new directories and setup for a new project
+  def makeNewProject(self, program, projectName): # Making all the new directories and setup for a new project
   	if os.path.exists(self.userDir):
-  		self.projectDir =  os.path.join(self.userDir, 'Projects/Active/', self.projectName)
+  		projectDir =  os.path.join(self.userDir, 'Projects/Active/', projectName)
+  		self.assetTracker.createLogs(projectDir, projectName, 'project')
 
-  		os.makedirs(self.projectDir + '/2D/Concepts')
-  		os.makedirs(self.projectDir + '/2D/Textures')
-  		os.makedirs(self.projectDir + '/2D/Comps')
-  		os.makedirs(self.projectDir + '/2D/Renders')
+  		os.makedirs(os.path.join(projectDir, '/2D/Concepts'))
+  		os.makedirs(os.path.join(projectDir, '/2D/Textures'))
+  		os.makedirs(os.path.join(projectDir, '/2D/Comps'))
+  		os.makedirs(os.path.join(projectDir, '/2D/Renders'))
 
-  		os.makedirs(self.projectDir + '/3D/Models/Characters')
-  		os.makedirs(self.projectDir + '/3D/Models/Environments')
-  		os.makedirs(self.projectDir + '/3D/Models/Props')
-  		os.makedirs(self.projectDir + '/3D/Rigs/Props')
-  		os.makedirs(self.projectDir + '/3D/Rigs/Characters')
-  		os.makedirs(self.projectDir + '/3D/Animations')
+  		os.makedirs(os.path.join(projectDir, '/3D/Models/Characters'))
+  		os.makedirs(os.path.join(projectDir,'/3D/Models/Environments'))
+  		os.makedirs(os.path.join(projectDir, '/3D/Models/Props'))
+  		os.makedirs(os.path.join(projectDir, '/3D/Rigs/Props'))
+  		os.makedirs(os.path.join(projectDir, '/3D/Rigs/Characters'))
+  		os.makedirs(os.path.join(projectDir, '/3D/Animations'))
 
   		if 'maya' in program:
-  			newWorkspace = os.path.join(self.projectDir, '/3D')
+  			newWorkspace = os.path.join(projectDir, '/3D')
   			cmds.workspace(dir=newWorkspace)
 
-  		os.makedirs(self.projectDir + '/Scripts')
-  		os.makedirs(self.projectDir + '/Documentation')
+  		os.makedirs(os.path.join(projectDir, '/Scripts/Python'))
+  		os.makedirs(os.path.join(projectDir, '/Scripts/MEL'))
+  		os.makedirs(projectDir + '/Documentation')
 
-  def makeNewRepo(sef): # Making all new repository for projects
+  def makeNewRepo(self, projectName): # Making all new repository for projects
   	try:
-  		os.makedirs(self.userDir + '/Projects/Active') # Main repository for active projects.
-  		if self.projectName:
-  			makeNewProject()
+  		os.makedirs(os.path.join(self.userDir, '/Projects/Active')) # Main repository for active projects.
+  		if projectName:
+  			makeNewProject(projectName)
 
-  		os.makedirs(self.userDir + '/Projects/Inactive') # Main repository for inactive projects
+  		os.makedirs(os.path.join(self.userDir, '/Projects/Inactive')) # Main repository for inactive projects
 
-  		os.makedirs(self.userDir + '/Projects/Global') # Main repository for global resources
-  		os.makedirs(self.userDir + '/Projects/Global/2D/Concepts')
-  		os.makedirs(self.userDir + '/Projects/Global/2D/Textures')
-  		#os.makedirs(self.userDir + '/Projects/Global/3D/Models/Maya')
-  		#os.makedirs(self.userDir + '/Projects/Global/3D/Models/Houdini')
-  		#os.makedirs(self.userDir + '/Projects/Global/3D/Models/Blender')
-  		os.makedirs(self.userDir + '/Projects/Global/3D/Models/Props/Maya')
-  		os.makedirs(self.userDir + '/Projects/Global/3D/Models/Props/Houdini')
-  		os.makedirs(self.userDir + '/Projects/Global/3D/Models/Props/Blender')
-  		os.makedirs(self.userDir + '/Projects/Global/3D/Models/Environments/Maya')
-  		os.makedirs(self.userDir + '/Projects/Global/3D/Models/Environments/Houdini')
-  		os.makedirs(self.userDir + '/Projects/Global/3D/Models/Environments/Blender')
-  		os.makedirs(self.userDir + '/Projects/Global/3D/Rigs/Maya')
-  		os.makedirs(self.userDir + '/Projects/Global/3D/Rigs/Houdini')
-  		os.makedirs(self.userDir + '/Projects/Global/3D/Rigs/Blender')
-  		os.makedirs(self.userDir + '/Projects/Global/3D/Animations/Maya')
-  		os.makedirs(self.userDir + '/Projects/Global/3D/Animations/Houdini')
-  		os.makedirs(self.userDir + '/Projects/Global/3D/Animations/Blender')
-  		os.makedirs(self.userDir + '/Projects/Global/Python/Scripts/Maya')
-  		os.makedirs(self.userDir + '/Projects/Global/Python/Scripts/Houdini')
-  		os.makedirs(self.userDir + '/Projects/Global/Python/Scripts/Katana')
-  		os.makedirs(self.userDir + '/Projects/Global/Python/Scripts/Blender')
-  		os.makedirs(self.userDir + '/Projects/Global/Python/Scripts/Nuke')
+  		os.makedirs(os.path.join(self.userDir, '/Projects/Global')) # Main repository for global resources
+  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/2D/Concepts'))
+  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/2D/Textures'))
+
+  		# Currntly focus on Maya because reasons
+  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Maya'))
+  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Houdini'))
+  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Blender'))
+
+  		# Currntly focus on Maya because reasons
+  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Props/Maya'))
+  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Props/Houdini'))
+  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Props/Blender'))
+
+  		# Currntly focus on Maya because reasons
+  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Environments/Maya'))
+  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Environments/Houdini'))
+  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Environments/Blender'))
+
+  		# Currntly focus on Maya because reasons
+  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Rigs/Maya'))
+  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Rigs/Houdini'))
+  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Rigs/Blender'))
+
+  		# Currntly focus on Maya because reasons
+  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Animations/Maya'))
+  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Animations/Houdini'))
+  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Animations/Blender'))
+
+  		# Currntly focus on Maya because reasons
+  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/Python/Scripts/Maya'))
+  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/MEL/Scripts/Maya'))
+  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/Python/Scripts/Houdini'))
+  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/Python/Scripts/Katana'))
+  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/Python/Scripts/Blender'))
+  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/Python/Scripts/Nuke'))
 
   	except OSError as exception:
   		if exception.errno != errno.EEXIST:
   			raise
 
-  def newAsset(self, assetName, assetType, relatedFiles): # New asset organization and documentation
+  def newAsset(self, assetName, assetType, relatedFiles, projectDir): # New asset organization and documentation
   	if 'Model' in assetType:
   		if 'Character' in assetType:
-  			newDir = os.path.join(self.projectDir, '/3D/Models/Character/', assetName)
+  			newDir = os.path.join(projectDir, '/3D/Models/Character/', assetName)
   			os.makedirs(newDir)
 
   			# Create Maya file
@@ -87,8 +103,19 @@ class ProjectOrganizer():
 
   			os.makedirs(newDir + '/Textures')
   			os.makedirs(newDir + '/Reference')
+
+  			self.assetTracker.createLogs(newDir, assetName, 'asset') # Adding log file
+  			project = os.listdir(projectDir) # Mark it in the project log
+  			for files in project:
+  				if files.endswith('.json'):
+  					projectLog = files
+  			self.assetTracker.projectLog(projectLog, 'newAsset', assetName)
+  			if relatedFiles:
+  				logName = assetName + 'Log.json'
+  				log = os.path.join(newDir, logName)
+  				self.assetTracker.updateLog(log, relatedFiles)
   		elif 'Environment' in assetType:
-  			newDir = os.path.join(self.projectDir, '/3D/Models/Environments/', assetName)
+  			newDir = os.path.join(projectDir, '/3D/Models/Environments/', assetName)
   			os.makedirs(newDir)
 
   			# Create Maya file
@@ -99,8 +126,20 @@ class ProjectOrganizer():
 
   			os.makedirs(newDir + '/Textures')
   			os.makedirs(newDir + '/Reference')
+
+  			self.assetTracker.createLogs(newDir, assetName, 'asset') # Adding log file
+  			project = os.listdir(projectDir) # Mark it in the project log
+  			for files in project:
+  				if files.endswith('.json'):
+  					projectLog = files
+  			self.assetTracker.projectLog(projectLog, 'newAsset', assetName)
+
+  			if relatedFiles:
+  				logName = assetName + 'Log.json'
+  				log = os.path.join(newDir, logName)
+  				self.assetTracker.updateLog(log, relatedFiles)
   		elif 'Prop' in assetType:
-  			newDir = os.path.join(self.projectDir, '/3D/Models/Props/', assetName)
+  			newDir = os.path.join(projectDir, '/3D/Models/Props/', assetName)
   			os.makedirs(newDir)
 
   			# Create Maya file
@@ -112,9 +151,20 @@ class ProjectOrganizer():
   			os.makedirs(newDir + '/Textures')
   			os.makedirs(newDir + '/Reference')
 
+  			self.assetTracker.createLogs(newDir, assetName, 'asset') # Adding log file
+  			project = os.listdir(projectDir) # Mark it in the project log
+  			for files in project:
+  				if files.endswith('.json'):
+  					projectLog = files
+  			self.assetTracker.projectLog(projectLog, 'newAsset', assetName)
+  			if relatedFiles:
+  				logName = assetName + 'Log.json'
+  				log = os.path.join(newDir, logName)
+  				self.assetTracker.updateLog(log, relatedFiles)
+
   	if 'Rig' in assetType:
   		if 'Character' in assetType:
-  			newDir = os.path.join(self.projectDir, '/3D/Rigs/Character/', assetName)
+  			newDir = os.path.join(projectDir, '/3D/Rigs/Character/', assetName)
   			os.makedirs(newDir)
   			modelDir = os.path.join(newDir, '/Model')
   			# Then it should copy over files needed
@@ -136,8 +186,19 @@ class ProjectOrganizer():
   			cmds.file(reference=modFile)
   			cmds.file(save=True, type='mayaAscii')
 
+  			self.assetTracker.createLogs(newDir, assetName, 'asset') # Adding log file
+  			project = os.listdir(projectDir) # Mark it in the project log
+  			for files in project:
+  				if files.endswith('.json'):
+  					projectLog = files
+  			self.assetTracker.projectLog(projectLog, 'newAsset', assetName)
+  			if relatedFiles:
+  				logName = assetName + 'Log.json'
+  				log = os.path.join(newDir, logName)
+  				self.assetTracker.updateLog(log, relatedFiles)
+
   		elif 'Prop' in assetName;
-  			newDir = os.path.join(self.projectDir, '/3D/Rigs/Prop/', assetName)
+  			newDir = os.path.join(projectDir, '/3D/Rigs/Prop/', assetName)
   			os.makedirs(newDir)
   			modelDir = os.path.join(newDir, '/Model')
   			# Then it should copy over files needed
@@ -159,8 +220,19 @@ class ProjectOrganizer():
   			cmds.file(reference=modFile)
   			cmds.file(save=True, type='mayaAscii')
 
+  			self.assetTracker.createLogs(newDir, assetName, 'asset') # Adding log file
+  			project = os.listdir(projectDir) # Mark it in the project log
+  			for files in project:
+  				if files.endswith('.json'):
+  					projectLog = files
+  			self.assetTracker.projectLog(projectLog, 'newAsset', assetName)
+  			if relatedFiles:
+  				logName = assetName + 'Log.json'
+  				log = os.path.join(newDir, logName)
+  				self.assetTracker.updateLog(log, relatedFiles)
+
   	if 'Animation' in assetType:
-		newDir = os.path.join(self.projectDir, '/3D/Animations/', assetName)
+		newDir = os.path.join(projectDir, '/3D/Animations/', assetName)
 		os.makedirs(newDir)
 		rigDir = os.path.join(newDir, '/Rigs')
 		envDir = os.path.join(newDir, '/Environment')
@@ -189,6 +261,17 @@ class ProjectOrganizer():
   		cmds.file(reference=envFile)
   		cmds.file(save=True, type='mayaAscii')
 
+  		self.assetTracker.createLogs(newDir, assetName, 'asset') # Adding log file
+  		project = os.listdir(projectDir) # Mark it in the project log
+		for files in project:
+			if files.endswith('.json'):
+				projectLog = files
+		self.assetTracker.projectLog(projectLog, 'newAsset', assetName)
+		if relatedFiles:
+			logName = assetName + 'Log.json'
+			log = os.path.join(newDir, logName)
+			self.assetTracker.updateLog(log, relatedFiles)
+
   def finalAsset(self, assetName, assetFile, program): # Creating a final/locked version of the asset
   	if 'maya' in program:
   		name = assetName.split('-')
@@ -197,6 +280,12 @@ class ProjectOrganizer():
   		cmds.file(rename=lockedName)
   		cmds.file(lockFile=True)
   		cmds.file(save=True, type='mayaAscii')
+
+  	assetDir = os.path.dirname(assetFile)
+  	for files in assetDir:
+		if files.endswith('.json'):
+			log = files
+  	self.assetTracker.setStatus(log, 'Final')
 
   def backupAsset(self): # A feature that allows for backing up at the end of each session
   	pass
