@@ -25,27 +25,32 @@ class AssetTracking(object):
 				data = {'Type': typeAsset,
 						'Creation': str(datetime.datetime.now()),
 						'Status': 'Active',
-						'Related Files': 'None'}
+						'Related Files': 'None',
+						'Project': 'None'}
 			elif 'model' in typeAsset:
 				data = {'Type': typeAsset,
 						'Creation': str(datetime.datetime.now()),
 						'Status': 'Active',
-						'Related Files': 'None'}
+						'Related Files': 'None',
+						'Project': 'None'}
 			elif 'rig' in typeAsset:
 				data = {'Type': typeAsset,
 						'Creation': str(datetime.datetime.now()),
 						'Status': 'Active',
-						'Related Files': 'None'}
+						'Related Files': 'None',
+						'Project': 'None'}
 			elif 'script' in typeAsset:
 				data = {'Type': typeAsset,
 						'Creation': str(datetime.datetime.now()),
 						'Status': 'Active',
-						'Related Files': 'None'}
+						'Related Files': 'None',
+						'Project': 'None'}
 			elif 'concpet' in typeAsset:
 				data = {'Type': typeAsset,
 						'Creation': str(datetime.datetime.now()),
 						'Status': 'Active',
-						'Concept Type': 'None'}
+						'Concept Type': 'None',
+						'Project': 'None'}
 		elif 'documentation' in typeAsset:
 			data = {'Type': typeAsset,
 					'Creation': str(datetime.datetime.now()),
@@ -53,6 +58,20 @@ class AssetTracking(object):
 
 		with open(log, 'w') as newLog:
 			json.dump(data, newLog)
+
+	def createGlobalLog(self, dir): # Keep the Global log seperate
+		logName = 'globalLog.json'
+		log = os.join.path(dir, logName)
+
+		data = {'Type': 'Global Directory',
+				'Creation': str(datetime.datetime.now()),
+				}
+
+		with open(log, 'w') as newLog:
+			json.dump(data, newLog)
+
+	def updateGlobalLog(self): # Add updates to Global log
+		pass
 
 	def updateLog(self, log, message): # Write to logs about updates to assets/project
 		with open(log, 'r') as logFile:
@@ -69,6 +88,16 @@ class AssetTracking(object):
 
 		data['Status'] = newStatus
 		data[str(datetime.datetime.now())] = 'Status changed to ' + newStatus
+
+		with opne(log, 'w') as logFile:
+			json.dump(data, logFile)
+
+	def setProject(self, log, project):
+		with open(log, 'r') as logFile:
+			data = json.load(logFile)
+
+		data['Project'] = project
+		data[str(datetime.datetime.now())] = 'Set project to ' + project
 
 		with opne(log, 'w') as logFile:
 			json.dump(data, logFile)
