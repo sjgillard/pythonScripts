@@ -6,6 +6,7 @@ import maya.standalone # Allows you to use Maya without the UI
 import maya.cmds as cmds
 import shutil
 import assetTracking
+import ntpath
 
 maya.standalone.initialize("Python")
 
@@ -49,6 +50,7 @@ class ProjectOrganizer():
   		os.makedirs(os.path.join(self.userDir, '/Projects/Inactive')) # Main repository for inactive projects
 
   		os.makedirs(os.path.join(self.userDir, '/Projects/Global')) # Main repository for global resources
+  		self.assetTracker.createGlobalLog(self.userDir)
   		os.makedirs(os.path.join(self.userDir, '/Projects/Global/2D/Concepts'))
   		os.makedirs(os.path.join(self.userDir, '/Projects/Global/2D/Textures'))
 
@@ -104,16 +106,7 @@ class ProjectOrganizer():
   			os.makedirs(newDir + '/Textures')
   			os.makedirs(newDir + '/Reference')
 
-  			self.assetTracker.createLogs(newDir, assetName, 'asset') # Adding log file
-  			project = os.listdir(projectDir) # Mark it in the project log
-  			for files in project:
-  				if files.endswith('.json'):
-  					projectLog = files
-  			self.assetTracker.projectLog(projectLog, 'newAsset', assetName)
-  			if relatedFiles:
-  				logName = assetName + 'Log.json'
-  				log = os.path.join(newDir, logName)
-  				self.assetTracker.updateLog(log, relatedFiles)
+  			logNewAsset(projectDir, assetName, relatedFiles)
   		elif 'Environment' in assetType:
   			newDir = os.path.join(projectDir, '/3D/Models/Environments/', assetName)
   			os.makedirs(newDir)
@@ -127,17 +120,7 @@ class ProjectOrganizer():
   			os.makedirs(newDir + '/Textures')
   			os.makedirs(newDir + '/Reference')
 
-  			self.assetTracker.createLogs(newDir, assetName, 'asset') # Adding log file
-  			project = os.listdir(projectDir) # Mark it in the project log
-  			for files in project:
-  				if files.endswith('.json'):
-  					projectLog = files
-  			self.assetTracker.projectLog(projectLog, 'newAsset', assetName)
-
-  			if relatedFiles:
-  				logName = assetName + 'Log.json'
-  				log = os.path.join(newDir, logName)
-  				self.assetTracker.updateLog(log, relatedFiles)
+  			logNewAsset(projectDir, assetName, relatedFiles)
   		elif 'Prop' in assetType:
   			newDir = os.path.join(projectDir, '/3D/Models/Props/', assetName)
   			os.makedirs(newDir)
@@ -151,16 +134,7 @@ class ProjectOrganizer():
   			os.makedirs(newDir + '/Textures')
   			os.makedirs(newDir + '/Reference')
 
-  			self.assetTracker.createLogs(newDir, assetName, 'asset') # Adding log file
-  			project = os.listdir(projectDir) # Mark it in the project log
-  			for files in project:
-  				if files.endswith('.json'):
-  					projectLog = files
-  			self.assetTracker.projectLog(projectLog, 'newAsset', assetName)
-  			if relatedFiles:
-  				logName = assetName + 'Log.json'
-  				log = os.path.join(newDir, logName)
-  				self.assetTracker.updateLog(log, relatedFiles)
+  			logNewAsset(projectDir, assetName, relatedFiles)
 
   	if 'Rig' in assetType:
   		if 'Character' in assetType:
@@ -186,16 +160,7 @@ class ProjectOrganizer():
   			cmds.file(reference=modFile)
   			cmds.file(save=True, type='mayaAscii')
 
-  			self.assetTracker.createLogs(newDir, assetName, 'asset') # Adding log file
-  			project = os.listdir(projectDir) # Mark it in the project log
-  			for files in project:
-  				if files.endswith('.json'):
-  					projectLog = files
-  			self.assetTracker.projectLog(projectLog, 'newAsset', assetName)
-  			if relatedFiles:
-  				logName = assetName + 'Log.json'
-  				log = os.path.join(newDir, logName)
-  				self.assetTracker.updateLog(log, relatedFiles)
+  			logNewAsset(projectDir, assetName, relatedFiles)
 
   		elif 'Prop' in assetName;
   			newDir = os.path.join(projectDir, '/3D/Rigs/Prop/', assetName)
@@ -220,16 +185,7 @@ class ProjectOrganizer():
   			cmds.file(reference=modFile)
   			cmds.file(save=True, type='mayaAscii')
 
-  			self.assetTracker.createLogs(newDir, assetName, 'asset') # Adding log file
-  			project = os.listdir(projectDir) # Mark it in the project log
-  			for files in project:
-  				if files.endswith('.json'):
-  					projectLog = files
-  			self.assetTracker.projectLog(projectLog, 'newAsset', assetName)
-  			if relatedFiles:
-  				logName = assetName + 'Log.json'
-  				log = os.path.join(newDir, logName)
-  				self.assetTracker.updateLog(log, relatedFiles)
+  			logNewAsset(projectDir, assetName, relatedFiles)
 
   	if 'Animation' in assetType:
 		newDir = os.path.join(projectDir, '/3D/Animations/', assetName)
@@ -261,17 +217,7 @@ class ProjectOrganizer():
   		cmds.file(reference=envFile)
   		cmds.file(save=True, type='mayaAscii')
 
-  		self.assetTracker.createLogs(newDir, assetName, 'asset') # Adding log file
-  		project = os.listdir(projectDir) # Mark it in the project log
-		for files in project:
-			if files.endswith('.json'):
-				projectLog = files
-		self.assetTracker.projectLog(projectLog, 'newAsset', assetName)
-		if relatedFiles:
-			logName = assetName + 'Log.json'
-			log = os.path.join(newDir, logName)
-			self.assetTracker.updateLog(log, relatedFiles)
-
+  		logNewAsset(projectDir, assetName, relatedFiles)
   def finalAsset(self, assetName, assetFile, program): # Creating a final/locked version of the asset
   	if 'maya' in program:
   		name = assetName.split('-')
@@ -287,8 +233,46 @@ class ProjectOrganizer():
 			log = files
   	self.assetTracker.setStatus(log, 'Final')
 
-  def backupAsset(self): # A feature that allows for backing up at the end of each session
-  	pass
+  def backupAsset(self, log, assetDir, assetFile): # A feature that allows for backing up at the end of each session
+  	backupPath = os.path.join(assetDir, '/Backup')
+
+  	assetFileName = ntpath.basename(assetFile)
+
+  	backupFileName = assetFileName.split('.ma')[0] + '_BACKUP00.ma'
+  	backupFile = os.path.join(backupPath, backupFileName)
+
+  	if os.path.exists(backupFile):
+  		i = 1
+  		exists = True
+  		while (exists=True):
+  			if os.path.exists(backupFile):
+  				i+=1
+  			else:
+  				exists = True
+
+  		count = str(i)
+  		if count < 10:
+  			backupFile = assetFileName.split[0] + '_BACKUP0' + count + '.ma'
+  		else:
+  			backupFile = assetFileName.split[0] + '_BACKUP' + count + '.ma'
+
+  	try:
+  		shutil.copytree(assetFile, backupPath) # Move the project files to the archive
+  	except OSError as exception:
+  		if exception.errno == errno.ENOTDIR:
+  			shutil.copy(assetFile, backupPath)
+  		else:
+  			raise
+
+  	os.rename(os.path.join(backupPath, assetFileName), backupFile)
+  	
+  	message = 'Backup added'
+  	self.assetTracker.updateLog(log, message)
+
+  def createBackup(self, assetDir): # Create backup dir
+  	backupPath = os.path.join(assetDir, '/Backup')
+  	if not os.path.exists(backupPath):
+  		os.makedirs(backupPath)
 
   def makeGlobal(self, assetDir, assetFile, destDir): # A feature to move a finaled asset to the Global dir
   	if 'final' not in assetFile:
@@ -306,7 +290,7 @@ class ProjectOrganizer():
   def passAsset(self): # A feature that allows for copying and pasting items in different dirs
   	pass
 
-  def archiveProject(self, oldProject): # For ending projects without deleting them
+  def archiveProject(self, log, oldProject): # For ending projects without deleting them
   	archiveDir = os.path.join(self.userDir, '/Projects/Inactive')
   	try:
   		shutil.copytree(oldProject, archiveDir) # Move the project files to the archive
@@ -316,4 +300,21 @@ class ProjectOrganizer():
   			shutil.copy(oldProject, archiveDir)
   		else:
   			raise
-  	
+	
+
+	self.assetTracker.projectLog(log, 'Archive')
+
+
+	def logNewAsset(self, projectDir, assetName, relatedFiles):
+		self.assetTracker.createLogs(newDir, assetName, 'asset') # Adding log file
+  		#self.assetTracker.setProject(log, project)
+
+		project = os.listdir(projectDir) # Mark it in the project log
+		for files in project:
+			if files.endswith('.json'):
+				projectLog = files
+		self.assetTracker.projectLog(projectLog, 'newAsset', assetName)
+		if relatedFiles:
+			logName = assetName + 'Log.json'
+			log = os.path.join(newDir, logName)
+			self.assetTracker.updateLog(log, relatedFiles)
