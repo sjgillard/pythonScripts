@@ -7,6 +7,7 @@ import maya.cmds as cmds
 import shutil
 import assetTracking
 import ntpath
+import fileFinder
 
 maya.standalone.initialize("Python")
 
@@ -41,51 +42,52 @@ class ProjectOrganizer():
   		os.makedirs(os.path.join(projectDir, '/Scripts/MEL'))
   		os.makedirs(projectDir + '/Documentation')
 
+
   def makeNewRepo(self, projectName): # Making all new repository for projects
   	try:
-  		os.makedirs(os.path.join(self.userDir, '/Projects/Active')) # Main repository for active projects.
+  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Active')) # Main repository for active projects.
   		if projectName:
   			makeNewProject(projectName)
 
-  		os.makedirs(os.path.join(self.userDir, '/Projects/Inactive')) # Main repository for inactive projects
+  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Inactive')) # Main repository for inactive projects
 
-  		os.makedirs(os.path.join(self.userDir, '/Projects/Global')) # Main repository for global resources
+  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global')) # Main repository for global resources
   		self.assetTracker.createGlobalLog(self.userDir)
-  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/2D/Concepts'))
-  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/2D/Textures'))
+  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/2D/Concepts'))
+  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/2D/Textures'))
 
   		# Currntly focus on Maya because reasons
-  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Maya'))
-  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Houdini'))
-  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Blender'))
+  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Maya'))
+  		#os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Houdini'))
+  		#os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Blender'))
 
   		# Currntly focus on Maya because reasons
-  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Props/Maya'))
-  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Props/Houdini'))
-  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Props/Blender'))
+  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Props/Maya'))
+  		#os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Props/Houdini'))
+  		#os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Props/Blender'))
 
   		# Currntly focus on Maya because reasons
-  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Environments/Maya'))
-  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Environments/Houdini'))
-  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Models/Environments/Blender'))
+  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Environments/Maya'))
+  		#os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Environments/Houdini'))
+  		#os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Environments/Blender'))
 
   		# Currntly focus on Maya because reasons
-  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Rigs/Maya'))
-  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Rigs/Houdini'))
-  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Rigs/Blender'))
+  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Rigs/Maya'))
+  		#os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Rigs/Houdini'))
+  		#os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Rigs/Blender'))
 
   		# Currntly focus on Maya because reasons
-  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Animations/Maya'))
-  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Animations/Houdini'))
-  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/3D/Animations/Blender'))
+  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Animations/Maya'))
+  		#os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Animations/Houdini'))
+  		#os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Animations/Blender'))
 
   		# Currntly focus on Maya because reasons
-  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/Python/Scripts/Maya'))
-  		os.makedirs(os.path.join(self.userDir, '/Projects/Global/MEL/Scripts/Maya'))
-  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/Python/Scripts/Houdini'))
-  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/Python/Scripts/Katana'))
-  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/Python/Scripts/Blender'))
-  		#os.makedirs(os.path.join(self.userDir, '/Projects/Global/Python/Scripts/Nuke'))
+  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/Python/Scripts/Maya'))
+  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/MEL/Scripts/Maya'))
+  		#os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/Python/Scripts/Houdini'))
+  		#os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/Python/Scripts/Katana'))
+  		#os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/Python/Scripts/Blender'))
+  		#os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/Python/Scripts/Nuke'))
 
   	except OSError as exception:
   		if exception.errno != errno.EEXIST:
