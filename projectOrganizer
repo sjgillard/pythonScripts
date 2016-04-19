@@ -230,12 +230,10 @@ class ProjectOrganizer():
   		cmds.file(save=True, type='mayaAscii')
 
   	assetDir = os.path.dirname(assetFile)
-  	for files in assetDir:
-		if files.endswith('.json'):
-			log = files
+	log = fileFinder.findLog(assetDir)
   	self.assetTracker.setStatus(log, 'Final')
 
-  def backupAsset(self, log, assetDir, assetFile): # A feature that allows for backing up at the end of each session
+  def backupAsset(self, assetDir, assetFile): # A feature that allows for backing up at the end of each session
   	backupPath = os.path.join(assetDir, '/Backup')
 
   	assetFileName = ntpath.basename(assetFile)
@@ -243,7 +241,7 @@ class ProjectOrganizer():
   	backupFileName = assetFileName.split('.ma')[0] + '_BACKUP00.ma'
   	backupFile = os.path.join(backupPath, backupFileName)
 
-  	if os.path.exists(backupFile):
+  	if os.path.exists(backupFile): # Check to see if backups exist with same name
   		i = 1
   		exists = True
   		while (exists=True):
@@ -268,6 +266,7 @@ class ProjectOrganizer():
 
   	os.rename(os.path.join(backupPath, assetFileName), backupFile)
   	
+  	log = fileFinder.findLog(assetDir)
   	message = 'Backup added'
   	self.assetTracker.updateLog(log, message)
 
@@ -289,8 +288,14 @@ class ProjectOrganizer():
 	  		else:
 	  			raise
 
-  def passAsset(self): # A feature that allows for copying and pasting items in different dirs
-  	pass
+  def passAsset(self, original, copyDir): # A feature that allows for copying and pasting items in different dirs
+  	copyfile(original, copyDir)
+
+  	finder = fileFinder.FileFinder(copyDir) # Get log for destination dir
+  	log = finder.findLog()
+  	message = original + 'added to directory' # Message for log
+
+  	self.assetTracker.updateLog(log, message) # Update log
 
   def archiveProject(self, log, oldProject): # For ending projects without deleting them
   	archiveDir = os.path.join(self.userDir, '/Projects/Inactive')
@@ -311,11 +316,10 @@ class ProjectOrganizer():
 		self.assetTracker.createLogs(newDir, assetName, 'asset') # Adding log file
   		#self.assetTracker.setProject(log, project)
 
-		project = os.listdir(projectDir) # Mark it in the project log
-		for files in project:
-			if files.endswith('.json'):
-				projectLog = files
+		finder = fileFinder.FileFinder(projectDir)# Mark it in the project log
+		projectLog = finder.findLog()
 		self.assetTracker.projectLog(projectLog, 'newAsset', assetName)
+
 		if relatedFiles:
 			logName = assetName + 'Log.json'
 			log = os.path.join(newDir, logName)
