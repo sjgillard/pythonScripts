@@ -59,6 +59,15 @@ class AssetTracking(object):
 		with open(log, 'w') as newLog:
 			json.dump(data, newLog)
 
+	def createMasterLog(self, dir):
+		logName = 'contactLog.json'
+		log = os.join.path(dir, logName)
+
+		data = {'User Email': 'None',
+				'Email Password': 'None',
+				'Team Contacts': 'None'
+				}
+
 	def createGlobalLog(self, dir): # Keep the Global log seperate
 		logName = 'globalLog.json'
 		log = os.join.path(dir, logName)
@@ -69,9 +78,6 @@ class AssetTracking(object):
 
 		with open(log, 'w') as newLog:
 			json.dump(data, newLog)
-
-	def updateGlobalLog(self): # Add updates to Global log
-		pass
 
 	def updateLog(self, log, message): # Write to logs about updates to assets/project
 		with open(log, 'r') as logFile:
@@ -154,6 +160,3 @@ class AssetTracking(object):
 
 			with opne(log, 'w') as logFile:
 				json.dump(data, logFile)
-
-	def svnUpdates(self): # Update file if SVN available
-		pass
