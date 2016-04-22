@@ -3,6 +3,8 @@
 import os
 import json
 import datetime
+import glob
+import fileFinder
 
 class AssetTracking(object):
 
@@ -160,3 +162,57 @@ class AssetTracking(object):
 
 			with opne(log, 'w') as logFile:
 				json.dump(data, logFile)
+
+	def findNewFiles(self): # Finding latest files that haven't been tracked
+		newestActive = []
+		newestGlobal = []
+		fileExtensions = ['.ma', '.mb', '.jpeg', '.png', '.doc', '.docx', '.py', '.mel']
+		for dirName, subdirList, fileList in os.walk('src/Projects/Active'):
+			for extension in fileExtensions:
+				temp = '*%s' % extension
+				tempName = os.path.join(dirName, temp)
+				newest = max(glob.iglob(tempName), key = os.path.getctime)
+				if newest:
+					newestActive.append(newest)
+
+		for dirName, subdirList, fileList in os.walk('src/Projects/Active'):
+			for extension in fileExtensions:
+				temp = '*%s' % extension
+				tempName = os.path.join(dirName, temp)
+				newest = max(glob.iglob(tempName), key = os.path.getctime)
+				if newest:
+					newestGlobal.append(newest)
+
+		finderActive = fileFinder.FileFinder('src/Projects/Active')
+		returnActive = []
+		for file in newestActive:
+			log = finderActive.findLog(file)
+			if log:
+				change = os.path.getctime(file)
+				with open(log, 'r') as logFile:
+					data = json.load(logFile)
+
+				for key in data:
+					if change not in key:
+						returnActive.append(file)
+			else:
+				returnActive.append(file)
+
+		finderGlobal = fileFinder.FileFinder('src/Projects/Global')
+		returnGlobal = []
+		for file in newestGlobal:
+			log = finderGlobal.findLog(file)
+			if log:
+				change = os.path.getctime(file)
+				with open(log, 'r') as logFile:
+					data = json.load(logFile)
+
+				for key in data:
+					if change not in key:
+						returnGlobal.append(file)
+			else:
+				returnGlobal.append(file)
+
+
+		return returnActive, returnGlobal
+
