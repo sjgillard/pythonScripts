@@ -9,13 +9,13 @@ import assetTracking
 import ntpath
 import fileFinder
 
-maya.standalone.initialize("Python")
+maya.standalone.initialize(name='python')
 
 class ProjectOrganizer():
 
   def __init__(self, userDir):
   	self.userDir = userDir
-	self.assetTracker = assetTracking.AssetTracking()
+		self.assetTracker = assetTracking.AssetTracking()
 
   def makeNewProject(self, program, projectName): # Making all the new directories and setup for a new project
   	if os.path.exists(self.userDir):
@@ -155,7 +155,7 @@ class ProjectOrganizer():
 
   			logNewAsset(projectDir, assetName, relatedFiles)
 
-  		elif 'Prop' in assetName;
+  		elif 'Prop' in assetName:
   			newDir = os.path.join(projectDir, '/3D/Rigs/Prop/', assetName)
   			os.makedirs(newDir)
   			modelDir = os.path.join(newDir, '/Model')
@@ -191,12 +191,12 @@ class ProjectOrganizer():
 
 
 		refFiles = []
-  			for root, dirs, files in os.walk(newDir):
-  				for file in files:
-  					if '_rig' in file:
- 						refFiles.append(file)
-  					elif '_env' in file:
-  						refFiles.append(file)
+		for root, dirs, files in os.walk(newDir):
+			for file in files:
+				if '_rig' in file:
+					refFiles.append(file)
+				elif '_env' in file:
+					refFiles.append(file)
 
   		# Create Maya file with references
   		createMayaFile(assetName, newDir, assetType, refFiles)
@@ -213,8 +213,7 @@ class ProjectOrganizer():
   		cmds.file(lockFile=True)
   		cmds.file(save=True, type='mayaAscii')
 
-  	assetDir = os.path.dirname(assetFile)
-	log = fileFinder.findLog(assetDir)
+		log = assetName.upper()
   	self.assetTracker.setStatus(log, 'Final')
 
   def backupAsset(self, assetDir, assetFile): # A feature that allows for backing up at the end of each session
@@ -228,7 +227,7 @@ class ProjectOrganizer():
   	if os.path.exists(backupFile): # Check to see if backups exist with same name
   		i = 1
   		exists = True
-  		while (exists=True):
+  		while (exists):
   			if os.path.exists(backupFile):
   				i+=1
   			else:
@@ -250,7 +249,7 @@ class ProjectOrganizer():
   		else:
   			raise
   	
-  	log = fileFinder.findLog(assetDir)
+  	log = assetFileName.upper()
   	message = 'Backup added'
   	self.assetTracker.updateLog(log, message)
 
@@ -275,13 +274,16 @@ class ProjectOrganizer():
   def passAsset(self, original, copyDir): # A feature that allows for copying and pasting items in different dirs
   	copyfile(original, copyDir)
 
-  	finder = fileFinder.FileFinder(copyDir) # Get log for destination dir
-  	log = finder.findLog()
-  	message = original + 'added to directory' # Message for log
+  	temp = os.path.basename(copyDir)
+  	log = temp.upper()
+  	originalName = os.path.basename(original)
+  	name = os.path.splitext(originalName)
+  	message = name + 'added to directory' # Message for log
 
   	self.assetTracker.updateLog(log, message) # Update log
+  	self.assetTracker.relatedFiles(log, originalName)
 
-  def archiveProject(self, log, oldProject): # For ending projects without deleting them
+  def archiveProject(self, oldProject): # For ending projects without deleting them
   	archiveDir = os.path.join(self.userDir, '/Projects/Inactive')
   	try:
   		shutil.copytree(oldProject, archiveDir) # Move the project files to the archive
@@ -293,7 +295,8 @@ class ProjectOrganizer():
   			raise
 	
 
-	self.assetTracker.projectLog(log, 'Archive')
+		log = os.path.basename(oldProject)
+		self.assetTracker.projectLog(log, 'Archive')
 
 	def deleteProject(self, projectDir): # The ability to delete a project for any reason
 		if 'Global' not in projectDir:
@@ -303,16 +306,12 @@ class ProjectOrganizer():
 
 
 	def logNewAsset(self, projectDir, assetName, relatedFiles):
-		self.assetTracker.createLogs(newDir, assetName, 'asset') # Adding log file
-			#self.assetTracker.setProject(log, project)
-
-		finder = fileFinder.FileFinder(projectDir)# Mark it in the project log
-		projectLog = finder.findLog()
-		self.assetTracker.projectLog(projectLog, 'newAsset', assetName)
+		project = os.path.basename(projectDir)
+		self.assetTracker.createLogs(newDir, assetName, 'asset', project) # Adding log file
+		self.assetTracker.projectLog(project, 'newAsset', assetName)
 
 		if relatedFiles:
-			logName = assetName + 'Log.json'
-			log = os.path.join(newDir, logName)
+			log = assetName.upper()
 			self.assetTracker.updateLog(log, relatedFiles)
 
 	def createMayaFile(self, asset, assetDir, assetType, references = []):
