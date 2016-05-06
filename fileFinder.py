@@ -1,16 +1,17 @@
 # File finder
 import os
+import glob
 
 class FileFinder(object):
 	def __init__(self, directory):
 		self.directory = directory
 
-	def findLog(self): # Find log file for given asset or project
-		for dirName, subdirList, fileList in os.walk(self.directory):
-			for file in fileList:
-				if 'Log.json' in file:
-					currDir = os.getcwd()
-					return os.path.join(currDir, file)
+	def findLog(self, name): # Find log file for given asset or project
+		conn = sqlite3.connect('trackingDB.db')
+		uppedName = name.upper()
+		log = conn.execute("SELECT * FROM %s" % uppedName)
+
+		return log
 
 	def findAssetFile(self, asset): # Find asset file path
 		assetFiles = []
@@ -22,8 +23,12 @@ class FileFinder(object):
 
 		return assetFiles
 
-	def findProject(self): # Find asset project
-		pass
+	def findProject(self, name): # Find asset project
+		conn = sqlite3.connect('trackingDB.db')
+		project = conn.execute("SELECT PROJECT FROM ASSET WHERE NAME = %s" % name)
+		conn.close()
+
+		return project
 
 	def findDirectory(self, findFile): # Find the directory or directories of any file given can be found in
 		for dirName, subdirList, fileList in os.walk(self.directory):
@@ -43,13 +48,12 @@ class FileFinder(object):
 		inactiveProjects = os.listdir(inactive)
 		return inactiveProjects
 
-	def getFileList(self, dirType): # Gets a list of files for any project or directory
+	def getFileList(self, dirType, name = ''): # Gets a list of files for any project or directory
 		if 'project' in dirType:
-			log = findLog()
-			with open(log, 'r') as logFile:
-				data = json.load(logFile)
-
-			return data['Asset List']
+			conn = sqlite3.connect('trackingDB.db')
+			temp = conn.execute("SELECT RELATED_FILES FROM PROJECTS WHERE NAME = %s" % name)
+			conn.close()
+			return temp
 		else:
 			fileList = []
 			for dirName, subdirList, fileList in os.walk(self.directory):
@@ -57,3 +61,16 @@ class FileFinder(object):
 					fileList.append(file)
 
 			return fileList
+
+	def findLatestFiles(self):
+		newestFiles = []
+		fileExtensions = ['.ma', '.mb', '.jpeg', '.png', '.doc', '.docx', '.py', '.mel']
+		for dirName, subdirList, fileList in os.walk('src/Projects/Active'):
+			for extension in fileExtensions:
+				temp = '*%s' % extension
+				tempName = os.path.join(dirName, temp)
+				newest = max(glob.iglob(tempName), key = os.path.getctime)
+				if newest:
+					newestFiles.append(newest)
+
+		return newestFiles
