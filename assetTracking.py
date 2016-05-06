@@ -2,154 +2,172 @@
 
 import os
 import json
+import sqlite3
 import datetime
 import glob
 import fileFinder
+import random
 
 class AssetTracking(object):
 
 	def __init__(self):
-		pass
+		self.conn = sqlite3.connect('trackingDB.db')
 
-	def createLogs(self, dir, name, typeAsset): # Create logs for assets and/or project
-		logName = name + 'Log.json'
-		log = os.join.path(dir, logName)
+	def createLogs(self, dir, name, typeAsset, project=''): # Create logs for assets and/or project
 
 		if 'project' in typeAsset:
-			data = {'Type': typeAsset,
-					'Creation': str(datetime.datetime.now()),
-					'Status': 'Active',
-					'Asset List': 'None',
-					'Team Members': 'None',
-					'Member Contact': 'None'}
+				creation = 'Created on ' + str(datetime.datetime.now())
+				idNum = random.randint(0, 100000)
+
+				# Add the project to the project table
+				conn.execute("INSERT INTO PROJECTS (ID, NAME, STATUS) \ VALUES (idNum, name, 'Active')")
 		elif 'Asset' in typeAsset:
 			if 'animation' in typeAsset:
-				data = {'Type': typeAsset,
-						'Creation': str(datetime.datetime.now()),
-						'Status': 'Active',
-						'Related Files': 'None',
-						'Project': 'None'}
+				upperName = name.upper()
+				time = str(datetime.datetime.now())
+				creation = 'Created on ' + str(datetime.datetime.now())
+				idNum = random.randint(0, 100000)
+
+				self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) \ VALUES (idNum, name, project, typeAsset, 'Active')")
+				self.conn.execute('''CREATE TABLE %s_UPDATES
+										(ID INT PRIMARY KEY     NOT NULL,
+											UPDATE_DATE   TEXT    NOT NULL,
+											UPDATES       TEXT    NOT NULL)''' % (upperName))
+				self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (time, creation)" % (name))
 			elif 'model' in typeAsset:
-				data = {'Type': typeAsset,
-						'Creation': str(datetime.datetime.now()),
-						'Status': 'Active',
-						'Related Files': 'None',
-						'Project': 'None'}
+				upperName = name.upper()
+				time = str(datetime.datetime.now())
+				creation = 'Created on ' + str(datetime.datetime.now())
+				idNum = random.randint(0, 100000)
+
+				self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) \ VALUES (idNum, name, project, typeAsset, 'Active')")
+				self.conn.execute('''CREATE TABLE %s_UPDATES
+										(ID INT PRIMARY KEY     NOT NULL,
+											UPDATE_DATE   TEXT    NOT NULL,
+											UPDATES       TEXT    NOT NULL)''' % (upperName))
+				self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (time, creation)" % (name))
 			elif 'rig' in typeAsset:
-				data = {'Type': typeAsset,
-						'Creation': str(datetime.datetime.now()),
-						'Status': 'Active',
-						'Related Files': 'None',
-						'Project': 'None'}
+				upperName = name.upper()
+				time = str(datetime.datetime.now())
+				creation = 'Created on ' + str(datetime.datetime.now())
+				idNum = random.randint(0, 100000)
+
+				self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) \ VALUES (idNum, name, project, typeAsset, 'Active')")
+				slef.conn.execute('''CREATE TABLE %s_UPDATES
+										(ID INT PRIMARY KEY     NOT NULL,
+											UPDATE_DATE   TEXT    NOT NULL,
+											UPDATES       TEXT    NOT NULL)''' % (upperName))
+				self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (time, creation)" % (name))
 			elif 'script' in typeAsset:
-				data = {'Type': typeAsset,
-						'Creation': str(datetime.datetime.now()),
-						'Status': 'Active',
-						'Related Files': 'None',
-						'Project': 'None'}
+				upperName = name.upper()
+				time = str(datetime.datetime.now())
+				creation = 'Created on ' + str(datetime.datetime.now())
+				idNum = random.randint(0, 100000)
+
+				self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) \ VALUES (idNum, name, project, typeAsset, 'Active')")
+				self.conn.execute('''CREATE TABLE %s_UPDATES
+										(ID INT PRIMARY KEY     NOT NULL,
+											UPDATE_DATE   TEXT    NOT NULL,
+											UPDATES       TEXT    NOT NULL)''' % (upperName))
+				self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (time, creation)" % (name))
 			elif 'concpet' in typeAsset:
-				data = {'Type': typeAsset,
-						'Creation': str(datetime.datetime.now()),
-						'Status': 'Active',
-						'Concept Type': 'None',
-						'Project': 'None'}
+				upperName = name.upper()
+				time = str(datetime.datetime.now())
+				creation = 'Created on ' + str(datetime.datetime.now())
+				idNum = random.randint(0, 100000)
+
+				self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) \ VALUES (idNum, name, project, typeAsset, 'Active')")
+				self.conn.execute('''CREATE TABLE %s_UPDATES
+										(ID INT PRIMARY KEY     NOT NULL,
+											UPDATE_DATE   TEXT    NOT NULL,
+											UPDATES       TEXT    NOT NULL)''' % (upperName))
+				self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (time, creation)" % (name))
 		elif 'documentation' in typeAsset:
-			data = {'Type': typeAsset,
-					'Creation': str(datetime.datetime.now()),
-					'Status': 'Active'}
+			upperName = name.upper()
+			time = str(datetime.datetime.now())
+			creation = 'Created on ' + str(datetime.datetime.now())
+			idNum = random.randint(0, 100000)
 
-		with open(log, 'w') as newLog:
-			json.dump(data, newLog)
+			self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) \ VALUES (idNum, name, project, typeAsset, 'Active')")
+			self.conn.execute('''CREATE TABLE %s_UPDATES
+									(ID INT PRIMARY KEY     NOT NULL,
+										UPDATE_DATE   TEXT    NOT NULL,
+										UPDATES       TEXT    NOT NULL)''' % (upperName))
+			self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (time, creation)" % (name))
 
-	def createMasterLog(self, dir):
-		logName = 'contactLog.json'
-		log = os.join.path(dir, logName)
+		self.conn.commit()
 
-		data = {'User Email': 'None',
-				'Email Password': 'None',
-				'Team Contacts': 'None'
-				}
+	def createMasterLogs(self, dir):
+		self.conn.execute('''CREATE TABLE PROJECTS
+						(ID INT PRIMARY KEY     NOT NULL,
+							NAME          TEXT    NOT NULL,
+							STATUS        TEXT    NOT NULL,
+							RELATED_FILES REAL)''')
+		self.conn.execute('''CREATE TABLE ASSETS
+						(ID INT PRIMARY KEY     NOT NULL,
+							NAME          TEXT    NOT NULL,
+							PROJECT       TEXT    NOT NULL,
+							TYPE          TEXT    NOT NULL,
+							STATUS        TEXT    NOT NULL,
+							RELATED_FILES REAL)''')
+		self.conn.execute('''CREATE TABLE TEAM_CONTACT
+						(ID INT PRIMARY KEY     NOT NULL,
+							MEMBER        TEXT    NOT NULL,
+							EMAIL         TEXT    NOT NULL,
+							PROJECT       TEXT    NOT NULL)''')
 
 	def createGlobalLog(self, dir): # Keep the Global log seperate
-		logName = 'globalLog.json'
-		log = os.join.path(dir, logName)
-
-		data = {'Type': 'Global Directory',
-				'Creation': str(datetime.datetime.now()),
-				}
-
-		with open(log, 'w') as newLog:
-			json.dump(data, newLog)
+		self.conn.execute('''CREATE TABLE GLOBAL
+						(ID INT PRIMARY KEY     NOT NULL,
+							ORIGIN        TEXT    NOT NULL,
+							ASSET         TEXT    NOT NULL)''')
 
 	def updateLog(self, log, message): # Write to logs about updates to assets/project
-		with open(log, 'r') as logFile:
-			data = json.load(logFile)
+		updateDate = str(datetime.datetime.now())
 
-		data[str(datetime.datetime.now())] = message
+		self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (updateDate, message)" % (log))
 
-		with open(log, 'w') as logFile:
-			json.dump(data, logFile)
+		self.conn.commit()
 
-	def setStatus(self, log, newStatus): # Set status of assets
-		with open(log, 'r') as logFile:
-			data = json.load(logFile)
+	def setStatus(self, name, log, newStatus): # Set status of assets
+		message = 'Status changed to ' + newStatus
+		updateDate = str(datetime.datetime.now())
+		self.conn.execute("INSERT INTO ASSETS STATUS = %s WHERE NAME = %s" % (newStatus, name))
 
-		data['Status'] = newStatus
-		data[str(datetime.datetime.now())] = 'Status changed to ' + newStatus
+		self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (updateDate, message)" % (log))
 
-		with opne(log, 'w') as logFile:
-			json.dump(data, logFile)
+		self.conn.commit()
 
-	def setProject(self, log, project):
-		with open(log, 'r') as logFile:
-			data = json.load(logFile)
+	def setProject(self, project, name):
+		self.conn.execute("INSERT INTO ASSETS PROJECT = %s WHERE NAME = %s" % (project, name))
 
-		data['Project'] = project
-		data[str(datetime.datetime.now())] = 'Set project to ' + project
-
-		with opne(log, 'w') as logFile:
-			json.dump(data, logFile)
-
+		self.conn.commit()
 
 	def relatedFilesLog(self, log, relatedFiles): # Write related files to logs
-		with open(log, 'r') as logFile:
-			data = json.load(logFile)
+		updateDate = str(datetime.datetime.now())
+		message = 'Adding list of related files: ' + relatedFiles
 
-		data['Related Files'] = relatedFiles
-		data[str(datetime.datetime.now())] = 'Adding list of related files: ' + relatedFiles
+		self.conn.execute("INSERT INTO ASSETS RELATED_FILES = %s WHERE NAME = %s" % (relatedFiles, name))
+		self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (updateDate, message)" % (log))
 
-		with opne(log, 'w') as logFile:
-			json.dump(data, logFile)
+		self.conn.commit()
 
-	def teamInform(self, log, teamList={}, action, message=''): # Inform any team members
+	def teamInform(self, member, project, email, message=''): # Inform any team members
 		if 'add' in action:
-			with open(log, 'r') as logFile:
-				data = json.load(logFile)
+			idNum = random.randint(0, 100000)
+			self.conn.execute("INSERT INTO TEAM_CONTACT (ID, MEMBER, EMAIL, PROJECT) \ VALUES (idNum, member, email, project)")
 
-			for member in teamList:
-				data['Team Members'] = member
-				data['Member Concept'] = teamList[member]
-
-			data[str(datetime.datetime.now())] = 'Adding team members and contact info'
-
-			with opne(log, 'w') as logFile:
-				json.dump(data, logFile)
+			self.conn.commit()
 
 		elif 'contact' in action:
 			pass # Send message to team members
 
-	def projectLog(self, log, status, assetList=[]): # Update project status and general asset updates
+	def projectLog(self, project, status, assetList=[]): # Update project status and general asset updates
 		if 'newAsset' in status:
-			with open(log, 'r') as logFile:
-				data = json.load(logFile)
-
-			for asset in assetList:
-				data['Asset List'].append(asset)
 
 			data[str(datetime.datetime.now())] = 'Adding new assets to project: ' + assetList
 
-			with opne(log, 'w') as logFile:
-				json.dump(data, logFile)
+			fileList = self.conn.execute("SELECT * FROM PROJECTS WHERE RELATED_FILES = *")
 
 		elif 'Archive' in status:
 			with open(log, 'r') as logFile:
@@ -157,8 +175,9 @@ class AssetTracking(object):
 
 			data['Status'] = 'Archived'
 
-			data[str(datetime.datetime.now())] = 'Project has been archived. You can find the archived files' +
-												  ' in src/Archived/\'Project Name\''
+			message = 'Project has been archived. You can find the archived files in src/Archived/\'Project Name\''
+
+			data[str(datetime.datetime.now())] = message
 
 			with opne(log, 'w') as logFile:
 				json.dump(data, logFile)
@@ -166,53 +185,27 @@ class AssetTracking(object):
 	def findNewFiles(self): # Finding latest files that haven't been tracked
 		newestActive = []
 		newestGlobal = []
-		fileExtensions = ['.ma', '.mb', '.jpeg', '.png', '.doc', '.docx', '.py', '.mel']
-		for dirName, subdirList, fileList in os.walk('src/Projects/Active'):
-			for extension in fileExtensions:
-				temp = '*%s' % extension
-				tempName = os.path.join(dirName, temp)
-				newest = max(glob.iglob(tempName), key = os.path.getctime)
-				if newest:
-					newestActive.append(newest)
-
-		for dirName, subdirList, fileList in os.walk('src/Projects/Active'):
-			for extension in fileExtensions:
-				temp = '*%s' % extension
-				tempName = os.path.join(dirName, temp)
-				newest = max(glob.iglob(tempName), key = os.path.getctime)
-				if newest:
-					newestGlobal.append(newest)
-
 		finderActive = fileFinder.FileFinder('src/Projects/Active')
+		finderGlobal = fileFinder.FileFinder('src/Projects/Global')
+
+		newestActive = finderActive.findLatestFiles()
+		newestGlobal = finderGlobal.findLatestFiles()
+
 		returnActive = []
 		for file in newestActive:
-			log = finderActive.findLog(file)
-			if log:
-				change = os.path.getctime(file)
-				with open(log, 'r') as logFile:
-					data = json.load(logFile)
+			temp = self.conn.execute("SELECT * FROM ASSETS WHERE NAME = %s" % file)
+			if not temp:
+				returnActive.append(temp)
 
-				for key in data:
-					if change not in key:
-						returnActive.append(file)
-			else:
-				returnActive.append(file)
-
-		finderGlobal = fileFinder.FileFinder('src/Projects/Global')
 		returnGlobal = []
 		for file in newestGlobal:
-			log = finderGlobal.findLog(file)
-			if log:
-				change = os.path.getctime(file)
-				with open(log, 'r') as logFile:
-					data = json.load(logFile)
-
-				for key in data:
-					if change not in key:
-						returnGlobal.append(file)
-			else:
-				returnGlobal.append(file)
+			temp = self.conn.execute("SELECT * FROM ASSETS WHERE NAME = %s" % file)
+			if not temp:
+				returnGlobal.append(temp)
 
 
 		return returnActive, returnGlobal
+
+	def closeConnection(self):
+		self.conn.clos()
 
