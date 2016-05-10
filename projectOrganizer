@@ -1,337 +1,450 @@
+#!/usr/bin/python
 # project organizer
 
 import os
 import errno
-import maya.standalone # Allows you to use Maya without the UI
-import maya.cmds as cmds
+#import maya.standalone # Allows you to use Maya without the UI
+#import maya.cmds as cmds
 import shutil
 import assetTracking
 import ntpath
 import fileFinder
+import sys
 
-maya.standalone.initialize(name='python')
+#maya.standalone.initialize(name='python')
 
 class ProjectOrganizer():
 
   def __init__(self, userDir):
-  	self.userDir = userDir
-		self.assetTracker = assetTracking.AssetTracking()
+    self.userDir = userDir
+    self.assetTracker = assetTracking.AssetTracking(self.userDir)
+    self.platform = sys.platform
 
   def makeNewProject(self, program, projectName): # Making all the new directories and setup for a new project
-  	if os.path.exists(self.userDir):
-  		projectDir =  os.path.join(self.userDir, 'Projects/Active/', projectName)
-  		self.assetTracker.createLogs(projectDir, projectName, 'project')
+    if os.path.exists(self.userDir):
+      if 'win32' in self.platform:
+        projectDir =  os.path.join(self.userDir, 'src\\Projects\\Active\\', projectName)
+        os.makedirs(projectDir)
+        self.assetTracker.createLogs(projectDir, projectName, 'project')
 
-  		os.makedirs(os.path.join(projectDir, '/2D/Concepts'))
-  		os.makedirs(os.path.join(projectDir, '/2D/Textures'))
-  		os.makedirs(os.path.join(projectDir, '/2D/Comps'))
-  		os.makedirs(os.path.join(projectDir, '/2D/Renders'))
+        os.makedirs(os.path.join(projectDir, '2D\\Concepts'))
+        os.makedirs(os.path.join(projectDir, '2D\\Textures'))
+        os.makedirs(os.path.join(projectDir, '2D\\Comps'))
+        os.makedirs(os.path.join(projectDir, '2D\\Renders'))
 
-  		os.makedirs(os.path.join(projectDir, '/3D/Models/Characters'))
-  		os.makedirs(os.path.join(projectDir,'/3D/Models/Environments'))
-  		os.makedirs(os.path.join(projectDir, '/3D/Models/Props'))
-  		os.makedirs(os.path.join(projectDir, '/3D/Rigs/Props'))
-  		os.makedirs(os.path.join(projectDir, '/3D/Rigs/Characters'))
-  		os.makedirs(os.path.join(projectDir, '/3D/Animations'))
+        os.makedirs(os.path.join(projectDir, '3D\\Models\\Characters'))
+        os.makedirs(os.path.join(projectDir, '3D\\Models\\Environments'))
+        os.makedirs(os.path.join(projectDir, '3D\\Models\\Props'))
+        os.makedirs(os.path.join(projectDir, '3D\\Rigs\\Props'))
+        os.makedirs(os.path.join(projectDir, '3D\\Rigs\\Characters'))
+        os.makedirs(os.path.join(projectDir, '3D\\Animations'))
 
-  		if 'maya' in program:
-  			newWorkspace = os.path.join(projectDir, '/3D')
-  			cmds.workspace(dir=newWorkspace)
+        if 'maya' in program:
+          #newWorkspace = os.path.join(projectDir, '/3D')
+          #cmds.workspace(dir=newWorkspace)
+          print 'maya things happened'
 
-  		os.makedirs(os.path.join(projectDir, '/Scripts/Python'))
-  		os.makedirs(os.path.join(projectDir, '/Scripts/MEL'))
-  		os.makedirs(projectDir + '/Documentation')
+        os.makedirs(os.path.join(projectDir, 'Scripts\\Python'))
+        os.makedirs(os.path.join(projectDir, 'Scripts\\MEL'))
+        os.makedirs(os.path.join(projectDir, 'Documentation'))
+      else:
+        projectDir =  os.path.join(self.userDir, 'src/Projects/Active/', projectName)
+        os.makedirs(projectDir)
+        self.assetTracker.createLogs(projectDir, projectName, 'project')
+
+        os.makedirs(os.path.join(projectDir, '2D/Concepts'))
+        os.makedirs(os.path.join(projectDir, '2D/Textures'))
+        os.makedirs(os.path.join(projectDir, '2D/Comps'))
+        os.makedirs(os.path.join(projectDir, '2D/Renders'))
+
+        os.makedirs(os.path.join(projectDir, '3D/Models/Characters'))
+        os.makedirs(os.path.join(projectDir, '3D/Models/Environments'))
+        os.makedirs(os.path.join(projectDir, '3D/Models/Props'))
+        os.makedirs(os.path.join(projectDir, '3D/Rigs/Props'))
+        os.makedirs(os.path.join(projectDir, '3D/Rigs/Characters'))
+        os.makedirs(os.path.join(projectDir, '3D/Animations'))
+
+        if 'maya' in program:
+          #newWorkspace = os.path.join(projectDir, '/3D')
+          #cmds.workspace(dir=newWorkspace)
+          print 'maya things happened'
+
+        os.makedirs(os.path.join(projectDir, 'Scripts/Python'))
+        os.makedirs(os.path.join(projectDir, 'Scripts/MEL'))
+        os.makedirs(os.path.join(projectDir, 'Documentation'))
 
 
-  def makeNewRepo(self, projectName, programDirs = []): # Making all new repository for projects
-  	try:
-  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Active')) # Main repository for active projects.
-  		if projectName:
-  			makeNewProject(projectName)
+  def makeNewRepo(self, projectName = '', programDirs = []): # Making all new repository for projects
+    try:
+      if 'win32' in self.platform:
+        os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Active')) # Main repository for active projects.
+      else:
+        os.makedirs(os.path.join(self.userDir, 'src/Projects/Active')) # Main repository for active projects.
+      self.assetTracker.createMasterLogs(self.userDir)
+      if projectName:
+        print projectName
+        self.makeNewProject('maya', projectName)
 
-  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Inactive')) # Main repository for inactive projects
+      if 'win32' in self.platform:
+        os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Inactive')) # Main repository for inactive projects
 
-  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global')) # Main repository for global resources
-  		self.assetTracker.createGlobalLog(self.userDir)
-  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/2D/Concepts'))
-  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/2D/Textures'))
+        os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Global')) # Main repository for global resources
+        self.assetTracker.createGlobalLog(self.userDir)
+        os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Global\\2D\\Concepts'))
+        os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Global\\2D\\Textures'))
 
-  		# Currntly focus on Maya because reasons
-  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Maya'))
-  		if programDirs:
-  			for program in programDirs:
-  				os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/', program))
+        # Currntly focus on Maya because reasons
+        os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Global\\3D\\Models\\Maya'))
+        if programDirs:
+          for program in programDirs:
+            os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Global\\3D\\Models\\', program))
 
-  		# Currntly focus on Maya because reasons
-  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Props/Maya'))
-  		if programDirs:
-  			for program in programDirs:
-  				os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Props/', program))
+        # Currntly focus on Maya because reasons
+        os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Global\\3D\\Models\\Props\\Maya'))
+        if programDirs:
+          for program in programDirs:
+            os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Global\\3D\\Models\\Props\\', program))
 
-  		# Currntly focus on Maya because reasons
-  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Environments/Maya'))
-  		if programDirs:
-  			for program in programDirs:
-  				os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Environments/', program))
+        # Currntly focus on Maya because reasons
+        os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Global\\3D\\Models\\Environments\\Maya'))
+        if programDirs:
+          for program in programDirs:
+            os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Global\\3D/Models\\Environments\\', program))
 
-  		# Currntly focus on Maya because reasons
-  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Rigs/Maya'))
-  		if programDirs:
-  			for program in programDirs:
-  				os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Rigs/', program))
+        # Currntly focus on Maya because reasons
+        os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Global\\3D\\Rigs\\Maya'))
+        if programDirs:
+          for program in programDirs:
+            os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Global\\3D\\Rigs\\', program))
 
-  		# Currntly focus on Maya because reasons
-  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Animations/Maya'))
-  		if programDirs:
-  			for program in programDirs:
-  				os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Animations/', program))
+        # Currntly focus on Maya because reasons
+        os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Global\\3D\\Animations\\Maya'))
+        if programDirs:
+          for program in programDirs:
+            os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Global\\3D\\Animations\\', program))
 
-  		# Currntly focus on Maya because reasons
-  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/Python/Scripts/Maya'))
-  		os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/MEL/Scripts/Maya'))
-  		if programDirs:
-  			for program in programDirs:
-  				os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/Python/Scripts/', program))
+        # Currntly focus on Maya because reasons
+        os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Global\\Python\\Scripts\\Maya'))
+        os.makedirs(os.path.join(self.userDir, 'src/Projects\\Global\\MEL\\Scripts\\Maya'))
+        if programDirs:
+          for program in programDirs:
+            os.makedirs(os.path.join(self.userDir, 'src\\Projects\\Global\\Python\\Scripts\\', program))
 
-  	except OSError as exception:
-  		if exception.errno != errno.EEXIST:
-  			raise
+
+      else:
+        os.makedirs(os.path.join(self.userDir, 'src/Projects/Inactive')) # Main repository for inactive projects
+
+        os.makedirs(os.path.join(self.userDir, 'src/Projects/Global')) # Main repository for global resources
+        self.assetTracker.createGlobalLog(self.userDir)
+        os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/2D/Concepts'))
+        os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/2D/Textures'))
+
+    		# Currntly focus on Maya because reasons
+        os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Maya'))
+        if programDirs:
+          for program in programDirs:
+            os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/', program))
+
+    		# Currntly focus on Maya because reasons
+        os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Props/Maya'))
+        if programDirs:
+          for program in programDirs:
+            os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Props/', program))
+
+    		# Currntly focus on Maya because reasons
+        os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Environments/Maya'))
+        if programDirs:
+          for program in programDirs:
+            os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Models/Environments/', program))
+
+    		# Currntly focus on Maya because reasons
+        os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Rigs/Maya'))
+        if programDirs:
+          for program in programDirs:
+            os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Rigs/', program))
+
+    		# Currntly focus on Maya because reasons
+        os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Animations/Maya'))
+        if programDirs:
+          for program in programDirs:
+            os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/3D/Animations/', program))
+
+    		# Currntly focus on Maya because reasons
+        os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/Python/Scripts/Maya'))
+        os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/MEL/Scripts/Maya'))
+        if programDirs:
+          for program in programDirs:
+            os.makedirs(os.path.join(self.userDir, 'src/Projects/Global/Python/Scripts/', program))
+
+    except OSError as exception:
+      if exception.errno != errno.EEXIST:
+        raise
+
+  def createMayaFile(self, asset, assetDir, assetType, references = []):
+    types = {'Model Character': '_mod-01.ma',
+           'Model Prop': '_mod_prop-01.ma',
+           'Model Environment': '_env-01.ma',
+            'Rig Character': '_rig-01.ma',
+            'Rig Prop': '_rig_prop-01.ma',
+            'Animation': '_ani-01.ma'
+            }
+
+    fileEnd = ''
+    for key in types:
+      if assetType in key:
+        fileEnd = types[key]
+
+    fileName = os.path.join(assetDir, asset + fileEnd)
+    cmds.file(new=True, force=True)
+    cmds.file(rename=fileName)
+    if references:
+      for ref in references:
+        cmds.file(reference=ref)
+    cmds.file(save=True, type='mayaAscii')
+
+  def logNewAsset(self, projectDir, assetName, relatedFiles):
+    project = os.path.basename(projectDir)
+    self.assetTracker.createLogs(assetName, 'asset', project) # Adding log file
+    self.assetTracker.projectLog(project, 'newAsset', assetName)
+
+    if relatedFiles:
+      log = assetName.upper()
+      self.assetTracker.updateLog(log, relatedFiles)
 
   def newAsset(self, assetName, assetType, relatedFiles, projectDir): # New asset organization and documentation
-  	if 'Model' in assetType:
-  		if 'Character' in assetType:
-  			newDir = os.path.join(projectDir, '/3D/Models/Character/', assetName)
-  			os.makedirs(newDir)
+    newDir = self.userDir
+    if 'Model' in assetType:
+      if 'Character' in assetType:
+        if 'win32' in self.platform:
+          newDir = os.path.join(projectDir, '3D\\Models\\Characters\\', assetName)
+        else:
+          newDir = os.path.join(projectDir, '3D/Models/Characters/', assetName)
+        
+        os.makedirs(newDir)
 
   			# Create Maya file
-  			createMayaFile(assetName, newDir, assetType)
+        #self.createMayaFile(assetName, newDir, assetType)
 
-  			os.makedirs(newDir + '/Textures')
-  			os.makedirs(newDir + '/Reference')
+        os.makedirs(os.path.join(newDir, 'Textures'))
+        os.makedirs(os.path.join(newDir, 'Reference'))
 
-  			logNewAsset(projectDir, assetName, relatedFiles)
-  		elif 'Environment' in assetType:
-  			newDir = os.path.join(projectDir, '/3D/Models/Environments/', assetName)
-  			os.makedirs(newDir)
+        self.logNewAsset(projectDir, assetName, relatedFiles)
+      elif 'Environment' in assetType:
+        if 'win32' in self.platform:
+          newDir = os.path.join(projectDir, '3D\\Models\\Environments\\', assetName)
+        else:
+          newDir = os.path.join(projectDir, '3D/Models/Environments/', assetName)
+        
+        os.makedirs(newDir)
 
-  			# Create Maya file
-  			createMayaFile(assetName, newDir, assetType)
+        # Create Maya file
+        #createMayaFile(assetName, newDir, assetType)
 
-  			os.makedirs(newDir + '/Textures')
-  			os.makedirs(newDir + '/Reference')
+        os.makedirs(os.path.join(newDir, 'Textures'))
+        os.makedirs(os.path.join(newDir, 'Reference'))
 
-  			logNewAsset(projectDir, assetName, relatedFiles)
-  		elif 'Prop' in assetType:
-  			newDir = os.path.join(projectDir, '/3D/Models/Props/', assetName)
-  			os.makedirs(newDir)
+        self.logNewAsset(projectDir, assetName, relatedFiles)
+      elif 'Prop' in assetType:
+        if 'win32' in self.platform:
+          newDir = os.path.join(projectDir, '3D\\Models\\Props\\', assetName)
+        else:
+          newDir = os.path.join(projectDir, '3D/Models/Props/', assetName)
+        
+        os.makedirs(newDir)
 
-  			# Create Maya file
-  			createMayaFile(assetName, newDir, assetType)
+        # Create Maya file
+        #self.createMayaFile(assetName, newDir, assetType)
 
-  			os.makedirs(newDir + '/Textures')
-  			os.makedirs(newDir + '/Reference')
+        os.makedirs(os.path.join(newDir, 'Textures'))
+        os.makedirs(os.path.join(newDir, 'Reference'))
 
-  			logNewAsset(projectDir, assetName, relatedFiles)
+        self.logNewAsset(projectDir, assetName, relatedFiles)
 
-  	if 'Rig' in assetType:
-  		if 'Character' in assetType:
-  			newDir = os.path.join(projectDir, '/3D/Rigs/Character/', assetName)
-  			os.makedirs(newDir)
-  			modelDir = os.path.join(newDir, '/Model')
-  			# Then it should copy over files needed
-  			if relatedFiles:
-  				for relatedFile in relatedFiles:
-  					copyfile(relatedFile, modelDir)
+    if 'Rig' in assetType:
+      if 'Character' in assetType:
+        if 'win32' in self.platform:
+          newDir = os.path.join(projectDir, '3D\\Rigs\\Characters\\', assetName)
+        else:
+          newDir = os.path.join(projectDir, '3D/Rigs/Characters/', assetName)
+        
+        os.makedirs(newDir)
+        modelDir = os.path.join(newDir, '/Model')
+      	# Then it should copy over files needed
+      	if relatedFiles:
+          for relatedFile in relatedFiles:
+            copyfile(relatedFile, modelDir)
 
-  			refFiles = []
-  			for root, dirs, files in os.walk(modelDir):
-  				for file in files:
-  					if '_mod' in file:
-  						refFiles.append(file)
+      	refFiles = []
+      	for root, dirs, files in os.walk(modelDir):
+          for file in files:
+            if '_mod' in file:
+              refFiles.append(file)
 
 
   			# Create Maya file with references
-  			createMayaFile(assetName, newDir, assetType, refFiles)
+        #self.createMayaFile(assetName, newDir, assetType, refFiles)
 
-  			logNewAsset(projectDir, assetName, relatedFiles)
+        self.logNewAsset(projectDir, assetName, relatedFiles)
 
-  		elif 'Prop' in assetName:
-  			newDir = os.path.join(projectDir, '/3D/Rigs/Prop/', assetName)
-  			os.makedirs(newDir)
-  			modelDir = os.path.join(newDir, '/Model')
-  			# Then it should copy over files needed
-  			if relatedFiles:
-  				for relatedFile in relatedFiles:
-  					copyfile(relatedFile, modelDir)
+      elif 'Prop' in assetName:
+        if 'win32' in self.platform:
+          newDir = os.path.join(projectDir, '3D\\Rigs\\Prop\\', assetName)
+        else:
+          newDir = os.path.join(projectDir, '3D/Rigs/Prop/', assetName)
+        
+        os.makedirs(newDir)
+        modelDir = os.path.join(newDir, 'Model')
+        # Then it should copy over files needed
+        if relatedFiles:
+          for relatedFile in relatedFiles:
+            copyfile(relatedFile, modelDir)
 
-  			refFiles = []
-  			for root, dirs, files in os.walk(modelDir):
-  				for file in files:
-  					if '_mod' in file:
-  						refFiles.append(file)
-
-
-  			# Create Maya file with references
-  			createMayaFile(assetName, newDir, assetType, refFiles)
-
-  			logNewAsset(projectDir, assetName, relatedFiles)
-
-  	if 'Animation' in assetType:
-		newDir = os.path.join(projectDir, '/3D/Animations/', assetName)
-		os.makedirs(newDir)
-		rigDir = os.path.join(newDir, '/Rigs')
-		envDir = os.path.join(newDir, '/Environment')
-		# Then it should copy over files needed
-		if relatedFiles:
-			for relatedFile in relatedFiles:
-				if 'Environment' in relatedFile:
-					copyfile(relatedFile, envDir)
-				elif 'Rig' in relatedFile:
-					copyfile(relatedFile, rigDir)
+        refFiles = []
+        for root, dirs, files in os.walk(modelDir):
+          for file in files:
+            if '_mod' in file:
+              refFiles.append(file)
 
 
-		refFiles = []
-		for root, dirs, files in os.walk(newDir):
-			for file in files:
-				if '_rig' in file:
-					refFiles.append(file)
-				elif '_env' in file:
-					refFiles.append(file)
+        # Create Maya file with references
+        #self.createMayaFile(assetName, newDir, assetType, refFiles)
 
-  		# Create Maya file with references
-  		createMayaFile(assetName, newDir, assetType, refFiles)
+        self.logNewAsset(projectDir, assetName, relatedFiles)
 
-  		logNewAsset(projectDir, assetName, relatedFiles)
+    if 'Animation' in assetType:
+      if 'win32' in self.platform:
+        newDir = os.path.join(projectDir, '3D\\Animations\\', assetName)
+      else:
+        newDir = os.path.join(projectDir, '3D/Animations/', assetName)
+      
+      os.makedirs(newDir)
+      rigDir = os.path.join(newDir, 'Rigs')
+      envDir = os.path.join(newDir, 'Environment')
+      # Then it should copy over files needed
+    if relatedFiles:
+      for relatedFile in relatedFiles:
+        if 'Environment' in relatedFile:
+          copyfile(relatedFile, envDir)
+        elif 'Rig' in relatedFile:
+          copyfile(relatedFile, rigDir)
+
+
+    refFiles = []
+    for root, dirs, files in os.walk(newDir):
+      for file in files:
+        if '_rig' in file:
+          refFiles.append(file)
+        elif '_env' in file:
+          refFiles.append(file)
+
+    	# Create Maya file with references
+    	#self.createMayaFile(assetName, newDir, assetType, refFiles)
+
+    	self.logNewAsset(projectDir, assetName, relatedFiles)
 
 
   def finalAsset(self, assetName, assetFile, program): # Creating a final/locked version of the asset
-  	if 'maya' in program:
-  		name = assetName.split('-')
-  		lockedName = name[0] + '-final.ma'
-  		cmds.file(assetFile, open=True)
-  		cmds.file(rename=lockedName)
-  		cmds.file(lockFile=True)
-  		cmds.file(save=True, type='mayaAscii')
+    if 'maya' in program:
+      name = assetName.split('-')
+      lockedName = name[0] + '-final.ma'
+      cmds.file(assetFile, open=True)
+      cmds.file(rename=lockedName)
+      cmds.file(lockFile=True)
+      cmds.file(save=True, type='mayaAscii')
 
-		log = assetName.upper()
-  	self.assetTracker.setStatus(log, 'Final')
+    log = assetName.upper()
+    self.assetTracker.setStatus(log, 'Final')
 
   def backupAsset(self, assetDir, assetFile): # A feature that allows for backing up at the end of each session
-  	backupPath = os.path.join(assetDir, '/Backup')
+    backupPath = os.path.join(assetDir, '/Backup')
 
-  	assetFileName = ntpath.basename(assetFile)
+    assetFileName = ntpath.basename(assetFile)
 
-  	backupFileName = assetFileName.split('.ma')[0] + '_BACKUP00.ma'
-  	backupFile = os.path.join(backupPath, backupFileName)
+    backupFileName = assetFileName.split('.ma')[0] + '_BACKUP00.ma'
+    backupFile = os.path.join(backupPath, backupFileName)
 
-  	if os.path.exists(backupFile): # Check to see if backups exist with same name
-  		i = 1
-  		exists = True
-  		while (exists):
-  			if os.path.exists(backupFile):
-  				i+=1
-  			else:
-  				exists = True
+    if os.path.exists(backupFile): # Check to see if backups exist with same name
+      i = 1
+      exists = True
+      while (exists):
+        if os.path.exists(backupFile):
+          i+=1
+        else:
+          exists = True
 
-  		count = str(i)
-  		if count < 10:
-  			backupFileName = assetFileName.split('.ma')[0] + '_BACKUP0' + count + '.ma'
-  			backupFile = os.path.join(backupPath, backupFileName)
-  		else:
-  			backupFileName = assetFileName.split('.ma')[0] + '_BACKUP' + count + '.ma'
-  			backupFile = os.path.join(backupPath, backupFileName)
+      count = str(i)
+      if count < 10:
+        backupFileName = assetFileName.split('.ma')[0] + '_BACKUP0' + count + '.ma'
+        backupFile = os.path.join(backupPath, backupFileName)
+      else:
+        backupFileName = assetFileName.split('.ma')[0] + '_BACKUP' + count + '.ma'
+        backupFile = os.path.join(backupPath, backupFileName)
 
-  	try:
-  		shutil.copytree(assetFile, backupFile) # Move the project files to the archive
-  	except OSError as exception:
-  		if exception.errno == errno.ENOTDIR:
-  			shutil.copy(assetFile, backupFile)
-  		else:
-  			raise
+    try:
+      shutil.copytree(assetFile, backupFile) # Move the project files to the archive
+    except OSError as exception:
+      if exception.errno == errno.ENOTDIR:
+        shutil.copy(assetFile, backupFile)
+      else:
+        raise
   	
-  	log = assetFileName.upper()
-  	message = 'Backup added'
-  	self.assetTracker.updateLog(log, message)
+    log = assetFileName.upper()
+    message = 'Backup added'
+    self.assetTracker.updateLog(log, message)
 
   def createBackup(self, assetDir): # Create backup dir
-  	backupPath = os.path.join(assetDir, '/Backup')
-  	if not os.path.exists(backupPath):
-  		os.makedirs(backupPath)
+    backupPath = os.path.join(assetDir, '/Backup')
+    if not os.path.exists(backupPath):
+      os.makedirs(backupPath)
 
   def makeGlobal(self, assetDir, assetFile, destDir): # A feature to move a finaled asset to the Global dir
-  	if 'final' not in assetFile:
-  		print 'Only final assets will be placed in Global.' # For now focus on getting only final versions.
-  	else:
-	  	try:
-	  		shutil.copytree(assetDir, destDir) # Move the all files connected to asset, may change to be specific
-	  										   # set of files. Still working it out.
-	  	except OSError as exception:
-	  		if exception.errno == errno.ENOTDIR:
-	  			shutil.copy(assetDir, destDir)
-	  		else:
-	  			raise
+    if 'final' not in assetFile:
+      print 'Only final assets will be placed in Global.' # For now focus on getting only final versions.
+    else:
+      try:
+        shutil.copytree(assetDir, destDir) # Move the all files connected to asset, may change to be specific
+    										   # set of files. Still working it out.
+      except OSError as exception:
+        if exception.errno == errno.ENOTDIR:
+          shutil.copy(assetDir, destDir)
+        else:
+          raise
 
   def passAsset(self, original, copyDir): # A feature that allows for copying and pasting items in different dirs
-  	copyfile(original, copyDir)
+    copyfile(original, copyDir)
 
-  	temp = os.path.basename(copyDir)
-  	log = temp.upper()
-  	originalName = os.path.basename(original)
-  	name = os.path.splitext(originalName)
-  	message = name + 'added to directory' # Message for log
+    temp = os.path.basename(copyDir)
+    log = temp.upper()
+    originalName = os.path.basename(original)
+    name = os.path.splitext(originalName)
+    message = name + 'added to directory' # Message for log
 
-  	self.assetTracker.updateLog(log, message) # Update log
-  	self.assetTracker.relatedFiles(log, originalName)
+    self.assetTracker.updateLog(log, message) # Update log
+    self.assetTracker.relatedFiles(log, originalName)
 
   def archiveProject(self, oldProject): # For ending projects without deleting them
-  	archiveDir = os.path.join(self.userDir, '/Projects/Inactive')
-  	try:
-  		shutil.copytree(oldProject, archiveDir) # Move the project files to the archive
-  		shutil.rmtree(oldProject) # Delete the original because a copy/backup has been made
-  	except OSError as exception:
-  		if exception.errno == errno.ENOTDIR:
-  			shutil.copy(oldProject, archiveDir)
-  		else:
-  			raise
-	
-
-		log = os.path.basename(oldProject)
-		self.assetTracker.projectLog(log, 'Archive')
-
-	def deleteProject(self, projectDir): # The ability to delete a project for any reason
-		if 'Global' not in projectDir:
-			shutil.rmtree(projectDir)
-		else:
-			return "The Global Project cannot be deleted."
+    archiveDir = self.userDir
+    if 'win32' in self.platform:
+      archiveDir = os.path.join(self.userDir, '\\Projects\\Inactive')
+    else:
+      archiveDir = os.path.join(self.userDir, '/Projects/Inactive')
+    
+    try:
+      shutil.copytree(oldProject, archiveDir) # Move the project files to the archive
+      shutil.rmtree(oldProject) # Delete the original because a copy/backup has been made
+    except OSError as exception:
+      if exception.errno == errno.ENOTDIR:
+        shutil.copy(oldProject, archiveDir)
+      else:
+        raise
 
 
-	def logNewAsset(self, projectDir, assetName, relatedFiles):
-		project = os.path.basename(projectDir)
-		self.assetTracker.createLogs(newDir, assetName, 'asset', project) # Adding log file
-		self.assetTracker.projectLog(project, 'newAsset', assetName)
+    log = os.path.basename(oldProject)
+    self.assetTracker.projectLog(log, 'Archive')
 
-		if relatedFiles:
-			log = assetName.upper()
-			self.assetTracker.updateLog(log, relatedFiles)
+  def deleteProject(self, projectDir): # The ability to delete a project for any reason
+    if 'Global' not in projectDir:
+      shutil.rmtree(projectDir)
+    else:
+      return "The Global Project cannot be deleted."
 
-	def createMayaFile(self, asset, assetDir, assetType, references = []):
-		types = {'Model Character': '_mod-01.ma',
-				 'Model Prop': '_mod_prop-01.ma',
-				 'Model Environment': '_env-01.ma',
-				 'Rig Character': '_rig-01.ma',
-				 'Rig Prop': '_rig_prop-01.ma',
-				 'Animation': '_ani-01.ma'
-				}
-
-		fileEnd = ''
-		for key in types:
-			if assetType in key:
-				fileEnd = types[key]
-
-		fileName = os.path.join(assetDir, asset + fileEnd)
-		cmds.file(new=True, force=True)
-		cmds.file(rename=fileName)
-		if references:
-			for ref in references:
-				cmds.file(reference=ref)
-		cmds.file(save=True, type='mayaAscii')
