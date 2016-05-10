@@ -1,7 +1,7 @@
+#!/usr/bin/python
 # Tracking functionality for projectOrganizer.py
 
 import os
-import json
 import sqlite3
 import datetime
 import glob
@@ -10,17 +10,18 @@ import random
 
 class AssetTracking(object):
 
-	def __init__(self):
-		self.conn = sqlite3.connect('trackingDB.db')
+	def __init__(self, userDir):
+		dbDir = os.path.join(userDir, 'trackingDB.db')
+		self.conn = sqlite3.connect(dbDir)
 
-	def createLogs(self, dir, name, typeAsset, project=''): # Create logs for assets and/or project
+	def createLogs(self, name, typeAsset, project=''): # Create logs for assets and/or project
 
 		if 'project' in typeAsset:
 				creation = 'Created on ' + str(datetime.datetime.now())
 				idNum = random.randint(0, 100000)
 
 				# Add the project to the project table
-				conn.execute("INSERT INTO PROJECTS (ID, NAME, STATUS) \ VALUES (idNum, name, 'Active')")
+				self.conn.execute("INSERT INTO PROJECTS (ID, NAME, STATUS) VALUES (?, ?, ?)", (idNum, name, 'Active'))
 		elif 'Asset' in typeAsset:
 			if 'animation' in typeAsset:
 				upperName = name.upper()
@@ -28,48 +29,48 @@ class AssetTracking(object):
 				creation = 'Created on ' + str(datetime.datetime.now())
 				idNum = random.randint(0, 100000)
 
-				self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) \ VALUES (idNum, name, project, typeAsset, 'Active')")
+				self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) VALUES (?, ?, ?)", (idNum, name, project, typeAsset, 'Active'))
 				self.conn.execute('''CREATE TABLE %s_UPDATES
 										(ID INT PRIMARY KEY     NOT NULL,
 											UPDATE_DATE   TEXT    NOT NULL,
 											UPDATES       TEXT    NOT NULL)''' % (upperName))
-				self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (time, creation)" % (name))
+				self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) VALUES (?, ?)" % (name), (time, creation))
 			elif 'model' in typeAsset:
 				upperName = name.upper()
 				time = str(datetime.datetime.now())
 				creation = 'Created on ' + str(datetime.datetime.now())
 				idNum = random.randint(0, 100000)
 
-				self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) \ VALUES (idNum, name, project, typeAsset, 'Active')")
+				self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) VALUES (?, ?, ?)", (idNum, name, project, typeAsset, 'Active'))
 				self.conn.execute('''CREATE TABLE %s_UPDATES
 										(ID INT PRIMARY KEY     NOT NULL,
 											UPDATE_DATE   TEXT    NOT NULL,
 											UPDATES       TEXT    NOT NULL)''' % (upperName))
-				self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (time, creation)" % (name))
+				self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) VALUES (?, ?)" % (name), (time, creation))
 			elif 'rig' in typeAsset:
 				upperName = name.upper()
 				time = str(datetime.datetime.now())
 				creation = 'Created on ' + str(datetime.datetime.now())
 				idNum = random.randint(0, 100000)
 
-				self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) \ VALUES (idNum, name, project, typeAsset, 'Active')")
+				self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) VALUES (?, ?)", (idNum, name, project, typeAsset, 'Active'))
 				slef.conn.execute('''CREATE TABLE %s_UPDATES
 										(ID INT PRIMARY KEY     NOT NULL,
 											UPDATE_DATE   TEXT    NOT NULL,
 											UPDATES       TEXT    NOT NULL)''' % (upperName))
-				self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (time, creation)" % (name))
+				self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) VALUES (?, ?)" % (name), (time, creation))
 			elif 'script' in typeAsset:
 				upperName = name.upper()
 				time = str(datetime.datetime.now())
 				creation = 'Created on ' + str(datetime.datetime.now())
 				idNum = random.randint(0, 100000)
 
-				self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) \ VALUES (idNum, name, project, typeAsset, 'Active')")
+				self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) VALUES (?, ?, ?)", (idNum, name, project, typeAsset, 'Active'))
 				self.conn.execute('''CREATE TABLE %s_UPDATES
 										(ID INT PRIMARY KEY     NOT NULL,
 											UPDATE_DATE   TEXT    NOT NULL,
 											UPDATES       TEXT    NOT NULL)''' % (upperName))
-				self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (time, creation)" % (name))
+				self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (?, ?)" % (name), (time, creation))
 			elif 'concpet' in typeAsset:
 				upperName = name.upper()
 				time = str(datetime.datetime.now())
@@ -81,19 +82,19 @@ class AssetTracking(object):
 										(ID INT PRIMARY KEY     NOT NULL,
 											UPDATE_DATE   TEXT    NOT NULL,
 											UPDATES       TEXT    NOT NULL)''' % (upperName))
-				self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (time, creation)" % (name))
+				self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (?, ?)" % (name), (time, creation))
 		elif 'documentation' in typeAsset:
 			upperName = name.upper()
 			time = str(datetime.datetime.now())
 			creation = 'Created on ' + str(datetime.datetime.now())
 			idNum = random.randint(0, 100000)
 
-			self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) \ VALUES (idNum, name, project, typeAsset, 'Active')")
+			self.conn.execute("INSERT INTO ASSETS (ID, NAME, PROJECT, TYPE, STATUS) VALUES (?, ?, ?)", (idNum, name, project, typeAsset, 'Active'))
 			self.conn.execute('''CREATE TABLE %s_UPDATES
 									(ID INT PRIMARY KEY     NOT NULL,
 										UPDATE_DATE   TEXT    NOT NULL,
 										UPDATES       TEXT    NOT NULL)''' % (upperName))
-			self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (time, creation)" % (name))
+			self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (?, ?)" % (name), (time, creation))
 
 		self.conn.commit()
 
@@ -125,7 +126,7 @@ class AssetTracking(object):
 	def updateLog(self, log, message): # Write to logs about updates to assets/project
 		updateDate = str(datetime.datetime.now())
 
-		self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (updateDate, message)" % (log))
+		self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) VALUES (?, ?)" % (log), (updateDate, message))
 
 		self.conn.commit()
 
@@ -134,7 +135,7 @@ class AssetTracking(object):
 		updateDate = str(datetime.datetime.now())
 		self.conn.execute("INSERT INTO ASSETS STATUS = %s WHERE NAME = %s" % (newStatus, name))
 
-		self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (updateDate, message)" % (log))
+		self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) VALUES (?, ?)" % (log), (updateDate, message))
 
 		self.conn.commit()
 
@@ -148,14 +149,14 @@ class AssetTracking(object):
 		message = 'Adding list of related files: ' + relatedFiles
 
 		self.conn.execute("INSERT INTO ASSETS RELATED_FILES = %s WHERE NAME = %s" % (relatedFiles, name))
-		self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (updateDate, message)" % (log))
+		self.conn.execute("INSERT INTO %s (UPDATE_DATE, UPDATES) \ VALUES (?, ?)" % (log), (updateDate, message))
 
 		self.conn.commit()
 
 	def teamInform(self, member, project, email, message=''): # Inform any team members
 		if 'add' in action:
 			idNum = random.randint(0, 100000)
-			self.conn.execute("INSERT INTO TEAM_CONTACT (ID, MEMBER, EMAIL, PROJECT) \ VALUES (idNum, member, email, project)")
+			self.conn.execute("INSERT INTO TEAM_CONTACT (ID, MEMBER, EMAIL, PROJECT) VALUES (?, ?, ?, ?)", (idNum, member, email, project))
 
 			self.conn.commit()
 
@@ -164,23 +165,20 @@ class AssetTracking(object):
 
 	def projectLog(self, project, status, assetList=[]): # Update project status and general asset updates
 		if 'newAsset' in status:
+			#time = str(datetime.datetime.now())
+			#message = 'Adding new assets to project: ' + assetList
 
-			data[str(datetime.datetime.now())] = 'Adding new assets to project: ' + assetList
+			fileList = self.conn.execute("SELECT RELATED_FILES FROM PROJECTS WHERE NAME = %s" % project)
+			for asset in assetList:
+				fileList.append(asset)
 
-			fileList = self.conn.execute("SELECT * FROM PROJECTS WHERE RELATED_FILES = *")
+			self.conn.execute("INSERT INTO PROJECTS (RELATED_FILES) VALUES (?) WHERE NAME = %s" % (project), (fileList))
 
-		elif 'Archive' in status:
-			with open(log, 'r') as logFile:
-				data = json.load(logFile)
+		if 'Archived' in status:
+			#time = str(datetime.datetime.now())
+			#message = 'Project has been archived. You can find the archived files in src/Archived/\'Project Name\''
 
-			data['Status'] = 'Archived'
-
-			message = 'Project has been archived. You can find the archived files in src/Archived/\'Project Name\''
-
-			data[str(datetime.datetime.now())] = message
-
-			with opne(log, 'w') as logFile:
-				json.dump(data, logFile)
+			self.conn.execute("INSERT INTO PROJECTS (STATUS) VALUES (?) WHERE NAME = %s" % (project), (status))
 
 	def findNewFiles(self): # Finding latest files that haven't been tracked
 		newestActive = []
@@ -207,5 +205,5 @@ class AssetTracking(object):
 		return returnActive, returnGlobal
 
 	def closeConnection(self):
-		self.conn.clos()
+		self.conn.close()
 
